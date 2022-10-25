@@ -56,22 +56,45 @@ const keepStyleList = [ 'color', 'background-color', 'line-height', 'text-indent
   'mso-char-indent-count', // word首行缩进字符数
   'margin-top', 'mso-para-margin-top', // word段前距
   'margin-bottom', 'mso-para-margin-bottom', // word段后距
+  'background-color',
+  'text-underline', // 下划线类型
+  'mso-pattern', 'mso-shading', // 文字底纹
+];
+const dropStyleList = [
+  'mso-highlight', // word 高亮文本背景颜色,html时background-color的优先级更高
 ];
 
 const inlineStyleObjectConvert = (styles = {}) => {
   const result = {};
   const keys = Object.keys(styles);
+  const fontFamilys = [];
   for (let i = 0; i < keys.length; i++) {
     const k = keys[i];
+    if (k.includes('font-family')) {
+      fontFamilys.push(k);
+      continue;
+    }
     if (keepStyleList.includes(k)) {
       result[k] = styles[k];
       continue;
     }
-    if ([ 'mso-hansi-font-family', 'mso-bidi-font-family' ].includes(k) && !result['font-family']) {
-      result['font-family'] = styles[k];
-    } else { // 暂不处理其他样式，待写完后端在考虑
+    // 暂不处理其他样式，待写完后端在考虑
+    if (!dropStyleList.includes(k)) {
       result[k] = k;
     }
+  }
+  if (fontFamilys.length) {
+    if (fontFamilys.includes('font-family')) {
+      result['font-family'] = styles['font-family'];
+    } else if (fontFamilys.includes('mso-fareast-font-family')) {
+      result['font-family'] = styles['mso-fareast-font-family'];
+    } else if (fontFamilys.includes('mso-bidi-font-family')) {
+      result['font-family'] = styles['mso-bidi-font-family'];
+    } else {
+      result['font-family'] = styles[fontFamilys[0]];
+    }
+
+
   }
   return result;
 };
