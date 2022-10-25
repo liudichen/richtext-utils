@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-24 14:52:20
- * @LastEditTime: 2022-10-24 17:52:43
+ * @LastEditTime: 2022-10-25 15:18:18
  */
 import { Parser } from 'htmlparser2';
 import { TAG, COMMENT, TEXT,
@@ -62,7 +62,17 @@ export const htmlToJson = (html, options) => {
           node.classList = (classNames || '').split(/\s+/).filter(Boolean);
         }
         if (options.keepAttributes) {
-          node.attrs = { ...attrs };
+          let keys = Object.keys(attrs);
+          if (keys.length && typeof options.attributeNameFilter === 'function') {
+            keys = keys.filter(options.attributeNameFilter);
+          }
+          if (keys.length) {
+            node.attrs = { };
+            for (let i = 0; i < keys.length; i++) {
+              const k = keys[i];
+              node.attrs[k] = attrs[k];
+            }
+          }
         }
         if (options.keepInlineStyle && style) {
           const styleText = style.replace(/&quot;/g, '');

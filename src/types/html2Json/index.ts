@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 12:09:03
- * @LastEditTime: 2022-10-25 12:11:52
+ * @LastEditTime: 2022-10-25 15:17:40
  */
 type inlineStyleObjectConvertFn= (styleObject: object) => object;
 export interface inlineStyleToObjectOptions {
@@ -72,4 +72,6 @@ export interface htmlToJsonOptions extends inlineStyleToObjectOptions {
    * @defaultValue false
    */
   skipComment?: boolean,
+  /** 过滤tag的属性名 */
+  attributeNameFilter?: (attributeName: string) => boolean,
 }
