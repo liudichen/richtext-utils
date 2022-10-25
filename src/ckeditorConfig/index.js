@@ -63,6 +63,7 @@ const keepStyleList = [ 'color', 'line-height', 'text-indent', 'font-size', 'fon
 ];
 const dropStyleList = [
   'mso-highlight', // word 高亮文本背景颜色,html时background-color的优先级更高
+  'mso-color-alt',
 ];
 
 const inlineStyleObjectConvert = (styles = {}) => {
@@ -73,6 +74,9 @@ const inlineStyleObjectConvert = (styles = {}) => {
     const k = keys[i];
     if (k.includes('font-family')) {
       fontFamilyKeys.push(k);
+      continue;
+    }
+    if (k.includes('language')) {
       continue;
     }
     if (keepStyleList.includes(k)) {
@@ -103,14 +107,19 @@ const inlineStyleObjectConvert = (styles = {}) => {
 };
 
 const nodePurify = (node) => {
-  const { type, tagName, children } = node;
+  let { type, tagName, children, style } = node;
   if (type === TEXT) return node;
   if (tagName === 'figcaption' || tagName === 'o:p') return false;
   if (tagName === 'div' || tagName === 'figure') {
     const res = children.map(nodePurify).filter(Boolean);
     return res.length ? res : false;
   }
-
+  style = inlineStyleObjectConvert(style);
+  if (tagName === 'span' && JSON.stringify(style) === '{}' && children.length) {
+    const res = children.map(nodePurify).filter(Boolean);
+    return res.length ? res : false;
+  }
+  return { ...node, style };
 };
 
 export const htmlPurify = (html) => {

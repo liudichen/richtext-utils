@@ -3,10 +3,9 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 22:13:05
- * @LastEditTime: 2022-10-25 23:09:26
+ * @LastEditTime: 2022-10-25 23:23:58
  */
-import { IWordElement } from 'src/types';
-
+import { IWordElement } from '../../types';
 export interface IGetTextElementParams {
   /** 字体
    * @defaultValue 宋体
