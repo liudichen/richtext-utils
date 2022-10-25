@@ -1,4 +1,5 @@
 import { htmlToJson } from '../dataParse/HtmltoJson';
+import { isAllChineseWord } from '../judge';
 
 export const ConfigForReadForWord = {
   fontFamily: {
@@ -47,7 +48,7 @@ const attributeNameFilter = (attrName) => {
   return allowAttrs.includes(attrName);
 };
 
-const keepStyleList = [ 'color', 'background-color', 'line-height', 'text-indent', 'font-size', 'font-family', 'width', 'height', 'text-align',
+const keepStyleList = [ 'color', 'line-height', 'text-indent', 'font-size', 'font-family', 'width', 'height', 'text-align',
   'vertical-align', '',
   //  <p style="line-height:150%;margin-left:55.5pt;mso-char-indent-count:-2.0;mso-para-margin-left:3.0gd;text-indent:-24.0pt;"><span style="font-size:12.0pt;">
   'margin-left', 'mso-para-margin-left', // word段落左缩进的字符数
@@ -58,7 +59,7 @@ const keepStyleList = [ 'color', 'background-color', 'line-height', 'text-indent
   'margin-bottom', 'mso-para-margin-bottom', // word段后距
   'background-color',
   'text-underline', // 下划线类型
-  'mso-pattern', 'mso-shading', // 文字底纹
+  'mso-font-kerning', // 字符间距
 ];
 const dropStyleList = [
   'mso-highlight', // word 高亮文本背景颜色,html时background-color的优先级更高
@@ -67,11 +68,11 @@ const dropStyleList = [
 const inlineStyleObjectConvert = (styles = {}) => {
   const result = {};
   const keys = Object.keys(styles);
-  const fontFamilys = [];
+  const fontFamilyKeys = [];
   for (let i = 0; i < keys.length; i++) {
     const k = keys[i];
     if (k.includes('font-family')) {
-      fontFamilys.push(k);
+      fontFamilyKeys.push(k);
       continue;
     }
     if (keepStyleList.includes(k)) {
@@ -83,18 +84,20 @@ const inlineStyleObjectConvert = (styles = {}) => {
       result[k] = k;
     }
   }
-  if (fontFamilys.length) {
-    if (fontFamilys.includes('font-family')) {
+  if (fontFamilyKeys.length) {
+    const fontFamilys = fontFamilyKeys.map((ele) => styles[ele]);
+    const index = fontFamilys.findIndex((ele) => isAllChineseWord(ele));
+    if (index !== -1) {
+      result['font-family'] = fontFamilys[index];
+    } else if (fontFamilyKeys.includes('font-family')) {
       result['font-family'] = styles['font-family'];
-    } else if (fontFamilys.includes('mso-fareast-font-family')) {
+    } else if (fontFamilyKeys.includes('mso-fareast-font-family')) {
       result['font-family'] = styles['mso-fareast-font-family'];
-    } else if (fontFamilys.includes('mso-bidi-font-family')) {
+    } else if (fontFamilyKeys.includes('mso-bidi-font-family')) {
       result['font-family'] = styles['mso-bidi-font-family'];
     } else {
-      result['font-family'] = styles[fontFamilys[0]];
+      result['font-family'] = styles[fontFamilyKeys[0]];
     }
-
-
   }
   return result;
 };

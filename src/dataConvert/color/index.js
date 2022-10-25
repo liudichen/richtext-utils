@@ -3,12 +3,9 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 18:21:46
- * @LastEditTime: 2022-10-25 21:31:03
+ * @LastEditTime: 2022-10-25 22:53:06
  */
-export const isHexColor = (color) => /^#?([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/.test(color);
-export const isRgbColor = (color) => /^(rgb|RGB)/.test(color);
-export const isHslColor = (color) => /^(hsl|HSL)/.test(color);
-export const isWordColor = (color) => /^[a-z]+[A-Za-z]+[a-z]$/.test(color) && !isHexColor(color);
+import { isHexColor, isHslColor, isRgbColor, isWordColor } from '../../judge';
 
 // HSL颜色值转换为RGB.* 换算公式改编自 http://en.wikipedia.org/wiki/HSL_color_space.* h, s, 和 l 设定在 [0, 1] 之间* 返回的 r, g, 和 b 在 [0, 255]之间
 const hue2rgb = (p, q, t) => {

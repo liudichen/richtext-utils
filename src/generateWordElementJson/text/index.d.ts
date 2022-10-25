@@ -3,15 +3,9 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 22:13:05
- * @LastEditTime: 2022-10-25 22:33:07
+ * @LastEditTime: 2022-10-25 23:09:26
  */
 import { IWordElement } from 'src/types';
-
-/** 文本中是否含有中文字符 */
-export const hasChineseWord: (str: string) => boolean;
-
-/** 文本全部为中文字符 */
-export const isAllChineseWord: (str: string) => boolean;
 
 export interface IGetTextElementParams {
   /** 字体
@@ -40,8 +34,10 @@ export interface IGetTextElementParams {
   sub?: boolean,
   /** 上标? */
   sup?: boolean,
-  /** 是否有文字底纹 */
-  shd?: boolean,
+  // /** 是否有文字底纹 */
+  // shd?: boolean,
+  /** 字符间距单位是pt */
+  kern?: string | number,
 }
 
 export const getTextElement: (params: IGetTextElementParams) => IWordElement;

@@ -3,12 +3,9 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 16:09:53
- * @LastEditTime: 2022-10-25 22:34:18
+ * @LastEditTime: 2022-10-25 23:13:14
  */
 import { camelCase } from '../../dataParse/HtmltoJson';
-
-export const isAllChineseWord = (str) => /^[\u4e00-\u9fa5]+$/.test(str);
-export const hasChineseWord = (str) => /[\u4e00-\u9fa5]+/.test(str);
 
 export const getTextElement = (params) => {
   let {
@@ -23,7 +20,8 @@ export const getTextElement = (params) => {
     backgroundColor, // 文字高亮背景色
     sub, // 下标
     sup, // 上标
-    shd, // 文字底纹
+    // shd, // 文字底纹
+    kern, // 字间距单位pt
   } = params || {};
   if (underline) underline = camelCase(underline);
   const w_r = {
@@ -40,13 +38,17 @@ export const getTextElement = (params) => {
             attributes: { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' },
             elements: [],
           },
+          // 格式插入这里
         ],
       },
       {
-        type: 'element', name: 'w:t', elements: [{ type: 'text', text: `${text || ' '}` }],
+        type: 'element', name: 'w:t', attributes: { 'xml:space': 'preserve' }, elements: [{ type: 'text', text: `${text || ' '}` }],
       },
     ],
   };
+  if (typeof kern !== 'undefined') {
+    w_r.elements[0].elements.push({ type: 'element', name: 'w:kern', attributes: { 'w:val': `${kern}` }, elements: [] });
+  }
   if (bold) {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:b', elements: [] });
     w_r.elements[0].elements.push({ type: 'element', name: 'w:bCs', elements: [] });
@@ -69,9 +71,9 @@ export const getTextElement = (params) => {
   if (underline) {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:u', attributes: { 'w:val': 'underline' }, elements: [] });
   }
-  if (shd) {
-    w_r.elements[0].elements.push({ type: 'element', name: 'w:shd', attributes: { 'w:val': 'pct15', 'w:color': 'auto', 'w:fill': 'FFFFFF' }, elements: [] });
-  }
+  // if (shd) {
+  //   w_r.elements[0].elements.push({ type: 'element', name: 'w:shd', attributes: { 'w:val': 'pct15', 'w:color': 'auto', 'w:fill': 'FFFFFF' }, elements: [] });
+  // }
   if (sub) {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:vertAlign', attributes: { 'w:val': 'subscript' }, elements: [] });
   } else if (sup) {
