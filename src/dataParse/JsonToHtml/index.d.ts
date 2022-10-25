@@ -3,10 +3,9 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-24 17:37:22
- * @LastEditTime: 2022-10-24 17:41:12
+ * @LastEditTime: 2022-10-25 12:13:43
  */
-
-import { jsonItem } from '../HtmltoJson';
+import { jsonItem } from '../../types';
 
 /** 将驼峰形式命名转化为下划线命名 */
 export const underlineCase: (key: string) => string;
