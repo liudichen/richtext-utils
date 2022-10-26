@@ -4,7 +4,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 11:00:03
- * @LastEditTime: 2022-10-26 16:00:18
+ * @LastEditTime: 2022-10-26 17:34:53
  */
 
 import { isAllChineseWord } from '../../judge';
@@ -275,3 +275,4 @@ export const getTextParams = (styles) => {
   data.text = (styles.text || '').replace(/&nbsp;/g, ' ');
   return data;
 };
+
