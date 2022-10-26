@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 16:09:53
- * @LastEditTime: 2022-10-26 10:38:05
+ * @LastEditTime: 2022-10-26 16:01:15
  */
 import { camelCase } from '../../dataParse/HtmltoJson';
 
@@ -35,7 +35,7 @@ export const getTextElement = (params) => {
           {
             type: 'element',
             name: 'w:rFonts',
-            attributes: { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' },
+            attributes: { 'w:hint': 'eastAsia' },
             elements: [],
           },
           // 格式插入这里
@@ -46,6 +46,9 @@ export const getTextElement = (params) => {
       },
     ],
   };
+  if (fontFamily) {
+    w_r.elements[0].elements[0].attributes = { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' };
+  }
   if (typeof kern !== 'undefined') {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:kern', attributes: { 'w:val': `${kern}` }, elements: [] });
   }

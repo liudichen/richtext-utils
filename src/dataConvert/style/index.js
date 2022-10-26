@@ -4,10 +4,11 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 11:00:03
- * @LastEditTime: 2022-10-26 15:33:01
+ * @LastEditTime: 2022-10-26 16:00:18
  */
 
 import { isAllChineseWord } from '../../judge';
+import { htmlColorToWordColor } from '../color';
 
 // // html的line-height转化为word中的行距(行高)
 // export const lineHeightHtmlToWordLineNumber = (lineHeight) => {
@@ -113,7 +114,7 @@ export const getFontFamily = (styles) => {
 };
 
 // w:pPr [w:spacing, w:ind, w:jc, w:rPr [w:rFonts, w:sz,w:szCs]]
-export const getParagraphAttributes = (styles) => {
+export const getParagraphParams = (styles) => {
   const data = {};
   const keys = Object.keys(styles || {});
   if (!keys.length) return {};
@@ -228,5 +229,49 @@ export const getParagraphAttributes = (styles) => {
 
   // ========== w:pPr -> w:rPr -> w:rFonts 暂时仅保留汉语字体
   data.fontFamily = getFontFamily(styles);
+  return data;
+};
+
+// w:r [w:rPr [w:rFonts w:kern w:b w:bCs w:i w:iCs w:strike w:color w:sz w:szCs w:hightlight w:u w:verAlign] w:t ]
+export const getTextParams = (styles) => {
+  const data = {};
+  const keys = Object.keys(styles || {});
+  if (!keys.length) return {};
+  data.fontFamily = getFontFamily(styles);
+  // w:kern
+  if (keys.includes('mso-font-kerning')) {
+    let kern = styles['mso-font-kerning'];
+    if (kern && kern?.endsWith('pt')) {
+      kern = +(kern.slice(0, kern.length - 2).trim());
+      if (kern) data.kern = kern * 2;
+    }
+  }
+  if (styles.bold === true) {
+    data.bold = true;
+  }
+  if (styles.italic === true) {
+    data.italic = true;
+  }
+  if (styles.strike === true) {
+    data.strike = true;
+  }
+  if (styles.color) {
+    data.color = htmlColorToWordColor(styles.color);
+  }
+  if (styles['font-size']) {
+    data.fontSize = htmlFontSizeToWordFontSizeNumber(styles['font-size']);
+  }
+  if (styles['background-color']) {
+    data.backgroundColor = htmlColorToWordColor(styles['background-color']);
+  }
+  if (styles.underline === true) {
+    data.underline = true;
+  }
+  if (styles.sub === true) {
+    data.sub = true;
+  } else if (styles.sup === true) {
+    data.sup = true;
+  }
+  data.text = (styles.text || '').replace(/&nbsp;/g, ' ');
   return data;
 };
