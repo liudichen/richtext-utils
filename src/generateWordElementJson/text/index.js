@@ -3,13 +3,13 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 16:09:53
- * @LastEditTime: 2022-10-25 23:13:14
+ * @LastEditTime: 2022-10-26 10:38:05
  */
 import { camelCase } from '../../dataParse/HtmltoJson';
 
 export const getTextElement = (params) => {
   let {
-    fontFamily = '宋体', // 字体
+    fontFamily, // 字体
     text, // 文本
     fontSize = 24, // 小四
     bold, // 加粗
@@ -42,7 +42,7 @@ export const getTextElement = (params) => {
         ],
       },
       {
-        type: 'element', name: 'w:t', attributes: { 'xml:space': 'preserve' }, elements: [{ type: 'text', text: `${text || ' '}` }],
+        type: 'element', name: 'w:t', attributes: { 'xml:space': 'preserve' }, elements: [{ type: 'text', text: `${text || ''}` }],
       },
     ],
   };

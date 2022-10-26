@@ -105,7 +105,7 @@ const inlineStyleObjectConvert = (styles = {}) => {
       result['font-family'] = styles[fontFamilyKeys[0]];
     }
   }
-  console.log({styles,result})
+  console.log({ styles, result });
   return result;
 
 };
@@ -113,7 +113,7 @@ const inlineStyleObjectConvert = (styles = {}) => {
 const nodePurify = (node) => {
   let { type, tagName, children, style } = node;
   if (type === TEXT) return node;
-  if (tagName === 'figcaption' ) return false;
+  if (tagName === 'figcaption') return false;
   if (tagName === 'div' || tagName === 'figure') {
     const res = children.map(nodePurify).filter(Boolean);
     return res.length ? res : false;
@@ -123,9 +123,9 @@ const nodePurify = (node) => {
     const res = children.map(nodePurify).filter(Boolean);
     return res.length ? res : false;
   }
-  if(children.length){
-    const newChildren = children.map(nodePurify).filter(Boolean)
-    return {...node,style,children:newChildren}
+  if (children.length) {
+    const newChildren = children.map(nodePurify).filter(Boolean);
+    return { ...node, style, children: newChildren };
   }
   return { ...node, style };
 };
@@ -135,12 +135,12 @@ export const htmlPurify = (html) => {
   const data = [];
   for (let i = 0; i < json.length; i++) {
     const node = nodePurify(json[i]);
-    if (node===false) continue;
+    if (node === false) continue;
     if (Array.isArray(node)) {
       data.push(...node);
     } else {
       data.push(node);
     }
   }
-  return data
+  return data;
 };
