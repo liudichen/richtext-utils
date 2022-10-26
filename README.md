@@ -16,7 +16,7 @@ $ npm install @iimm/richtext-utils
 #### 属性名称处理工具
 1. pascalCase: (key: string) => string 将下划线名称转化为大驼峰式命名
 2. camelCase: (key: string) => string 将下划线名称转化为小驼峰命名
-3. underlineCase: (key: string) => string 将驼峰式命名转化为下划线命名
+3. separatorCase: (key: string) => string 将驼峰式命名转化为下划线命名
 
 ### html与json格式转化工具
 1. jsonToHtml: (json: jsonItem | jsonItem[]) => string

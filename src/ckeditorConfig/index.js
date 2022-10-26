@@ -52,9 +52,11 @@ const keepStyleList = [ 'color', 'line-height', 'text-indent', 'font-size', 'fon
   'vertical-align', '',
   //  <p style="line-height:150%;margin-left:55.5pt;mso-char-indent-count:-2.0;mso-para-margin-left:3.0gd;text-indent:-24.0pt;"><span style="font-size:12.0pt;">
   'margin-left', 'mso-para-margin-left', // word段落左缩进的字符数
-  'margin-right', 'mso-para-margin-left', // word段落右缩进的字符数
+  'margin-right', 'mso-para-margin-right', // word段落右缩进的字符数
   // style="line-height:150%;margin-top:12.0pt;mso-char-indent-count:2.0;mso-para-margin-top:1.0gd;text-indent:24.0pt;"
   'mso-char-indent-count', // word首行缩进字符数
+  // tyle="line-height:150%;margin:18.0pt 15.75pt 6.0pt 55.5pt;mso-char-indent-count:-2.0;mso-para-margin-bottom:.5gd;mso-para-margin-left:3.0gd;mso-para-margin-right:1.5gd;mso-para-margin-top:1.5gd;text-indent:-24.0pt;"
+  'margin',
   'margin-top', 'mso-para-margin-top', // word段前距
   'margin-bottom', 'mso-para-margin-bottom', // word段后距
   'background-color',
@@ -85,7 +87,7 @@ const inlineStyleObjectConvert = (styles = {}) => {
     }
     // 暂不处理其他样式，待写完后端在考虑
     if (!dropStyleList.includes(k)) {
-      result[k] = k;
+      result[k] = styles[k];
     }
   }
   if (fontFamilyKeys.length) {
@@ -103,13 +105,15 @@ const inlineStyleObjectConvert = (styles = {}) => {
       result['font-family'] = styles[fontFamilyKeys[0]];
     }
   }
+  console.log({styles,result})
   return result;
+
 };
 
 const nodePurify = (node) => {
   let { type, tagName, children, style } = node;
   if (type === TEXT) return node;
-  if (tagName === 'figcaption' || tagName === 'o:p') return false;
+  if (tagName === 'figcaption' ) return false;
   if (tagName === 'div' || tagName === 'figure') {
     const res = children.map(nodePurify).filter(Boolean);
     return res.length ? res : false;
@@ -119,6 +123,10 @@ const nodePurify = (node) => {
     const res = children.map(nodePurify).filter(Boolean);
     return res.length ? res : false;
   }
+  if(children.length){
+    const newChildren = children.map(nodePurify).filter(Boolean)
+    return {...node,style,children:newChildren}
+  }
   return { ...node, style };
 };
 
@@ -127,11 +135,12 @@ export const htmlPurify = (html) => {
   const data = [];
   for (let i = 0; i < json.length; i++) {
     const node = nodePurify(json[i]);
-    if (!node) continue;
+    if (node===false) continue;
     if (Array.isArray(node)) {
       data.push(...node);
     } else {
       data.push(node);
     }
   }
+  return data
 };

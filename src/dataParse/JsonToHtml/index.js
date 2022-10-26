@@ -4,7 +4,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-24 17:05:08
- * @LastEditTime: 2022-10-24 17:52:25
+ * @LastEditTime: 2022-10-26 08:47:46
  */
 import {
   TAG, TEXT, COMMENT,
@@ -24,8 +24,12 @@ const setAttrs = (attrs, results) => {
   });
 };
 
-export const underlineCase = (key) => {
-  return (key || '').replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLowerCase();
+export const separatorCase = (key,separator='_') => {
+  let str = key ||'';
+  if(str.length && str.slice(0,1)===str.slice(0,1).toUpperCase()){
+    str = str.slice(0,1).toLowerCase()+str.slice(1)
+  }
+  return str.replace(/([A-Z])/g, `${separator}$1`)
 };
 
 const toElement = (elementInfo, results) => {
@@ -39,11 +43,11 @@ const toElement = (elementInfo, results) => {
         inlineStyle = '';
         for (let i = 0; i < styleKeys.length; i++) {
           const k = styleKeys[i];
-          inlineStyle += `${underlineCase(k)}:${elementInfo.style};`;
+          inlineStyle += `${k}:${elementInfo.style[k]};`;
         }
       }
       if (inlineStyle) {
-        results.push(' style="', elementInfo.inlineStyle, '"');
+        results.push(' style="', inlineStyle, '"');
       }
       if (elementInfo.classList?.length) {
         results.push(' class="', elementInfo.classList.join(' '), '"');
