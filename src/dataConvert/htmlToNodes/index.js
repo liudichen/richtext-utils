@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 16:11:27
- * @LastEditTime: 2022-10-26 17:49:08
+ * @LastEditTime: 2022-10-26 22:51:02
  */
 import { TAG } from '../../dataParse/constant';
 import { htmlToJson } from '../../dataParse/HtmltoJson';
@@ -41,6 +41,8 @@ const parseSpan = (node, specailStyles = {}, parentStyles = {}, result = []) => 
 
 const parseParagraph = (node) => {
   const { children, style } = node;
+  const data = [];
+  let imgFirst = true;
   const paragraphParams = getParagraphParams(style);
   const items = [];
   for (let i = 0; i < children.length; i++) {
@@ -50,24 +52,49 @@ const parseParagraph = (node) => {
       const result = [];
       parseSpan(child, {}, {}, result);
       items.push(...result);
+      if (!data.length) imgFirst = false;
     } else if (tagName === 'img') {
-      items.push(parseImage(child));
+      data.push(parseImage(child));
+    }
+  }
+  if (imgFirst) {
+    data.push({ ...paragraphParams, items });
+  } else {
+    data.unshift({ ...paragraphParams, items });
+  }
+  return data;
+};
+
+const parseLi = (li, lvl = 0, result = []) => {
+  for (let i = 0; i < li.children.length; i++) {
+    const node = li.children[i];
+    const { tagName, style, children } = node;
+    if (tagName === 'span') {
+      result.push(parseParagraph({ ...node, style: { ...style, 'mso-char-indent-count': `${lvl + 1}.0gd`, 'mso-para-margin-left': `${lvl}.0gd` } }));
+    } else if (tagName === 'ol' || tagName === 'ul') {
+      children.forEach((ele) => parseLi(ele, lvl + 1, result));
     }
   }
 };
-const parseTable = (node) => {
-
-};
-
-
+// 直接按悬挂缩进2个字符的段落处理，不会获得任何样式
 const parseList = (node) => {
-
+  const { children } = node;
+  const result = [];
+  for (let i = 0; i < children.length; i++) {
+    const li = children[i];
+    parseLi(li, 0, result);
+  }
 };
 
 const parseHead = (node) => {
-
+  const { tagName, style } = node;
+  const lvl = tagName.slice(-1);
+  return parseParagraph({ ...node, style: { ...style, pStyle: lvl } });
 };
 
+const parseTable = (node) => {
+
+};
 const parseNode = (node) => {
   const { type, tagName, children } = node;
   if (type === TAG && [ 'o:p', 'figcaption' ].includes(tagName)) { return false; }
@@ -88,10 +115,19 @@ export const htmlToNodes = (htmlStr) => {
   for (let i = 0; i < jsonArr.length; i++) {
     let node = parseNode(jsonArr[i]);
     if (!node) continue;
-    if (Array.isArray(node)) {
+    if (Array.isArray(node)) { // 有一定的可能性是2层数组（figure导致的）
       node = node.filter(Boolean);
-      if (node.length) {
-        data.push(...node);
+      const arr = [];
+      for (let j = 0; j < node.length; j++) {
+        const nn = node[j];
+        if (Array.isArray(nn)) {
+          arr.push(...nn.filter(Boolean));
+        } else {
+          arr.push(nn);
+        }
+      }
+      if (arr.length) {
+        data.push(...arr);
       }
     } else {
       data.push(node);

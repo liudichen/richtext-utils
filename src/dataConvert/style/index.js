@@ -4,7 +4,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 11:00:03
- * @LastEditTime: 2022-10-26 17:34:53
+ * @LastEditTime: 2022-10-26 22:40:19
  */
 
 import { isAllChineseWord } from '../../judge';
@@ -115,9 +115,10 @@ export const getFontFamily = (styles) => {
 
 // w:pPr [w:spacing, w:ind, w:jc, w:rPr [w:rFonts, w:sz,w:szCs]]
 export const getParagraphParams = (styles) => {
-  const data = {};
+  const data = { type: 'p' };
   const keys = Object.keys(styles || {});
   if (!keys.length) return {};
+  if (styles?.pStyle) data.pStyle = styles.pStyle;
   // === w:pPr -> w:spacing ======
   if (true) {
     if (keys.includes('line-height')) {
