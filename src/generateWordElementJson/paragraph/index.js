@@ -5,7 +5,7 @@ import { getTextElement } from '../text';
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 23:24:33
- * @LastEditTime: 2022-10-26 15:27:39
+ * @LastEditTime: 2022-10-26 22:37:22
  */
 `
       <w:pPr>
@@ -45,7 +45,17 @@ export const getParagraphElement = (params) => {
     csFont, // w:cs
     fontSize,
     items,
+    pStyle, // 预定义样式名，如标题等级
   } = params || {};
+  let w_pStyle = null;
+  if (pStyle) {
+    w_pStyle = {
+      type: 'element',
+      name: 'w:pStyle',
+      attributes: { 'w:val': `${pStyle}` },
+      elements: [],
+    };
+  }
   let w_spacing = null;
   if (line || before || after) {
     w_spacing = {
@@ -138,12 +148,13 @@ export const getParagraphElement = (params) => {
     }
   }
   let w_pPr = null;
-  if (w_spacing || w_ind || w_jc || w_rPr) {
+  if (w_pStyle || w_spacing || w_ind || w_jc || w_rPr) {
     w_pPr = {
       type: 'element',
       name: 'w:pPr',
       elements: [],
     };
+    if (w_pStyle) w_pPr.elements.push(w_pStyle);
     if (w_spacing) w_pPr.elements.push(w_spacing);
     if (w_ind) w_pPr.elements.push(w_ind);
     if (w_jc) w_pPr.elements.push(w_jc);
