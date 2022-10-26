@@ -5,7 +5,7 @@ import { getTextElement } from '../text';
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 23:24:33
- * @LastEditTime: 2022-10-26 22:37:22
+ * @LastEditTime: 2022-10-26 23:53:49
  */
 `
       <w:pPr>
@@ -172,16 +172,20 @@ export const getParagraphElement = (params) => {
   if (w_pPr) {
     w_p.elements.push(w_pPr);
   }
-  for (let i = 0; i < items?.length; i++) {
-    const node = items[i];
-    const { type } = node || {};
-    if (type === 'text') {
-      const textEle = getTextElement(node);
-      w_p.elements.push(textEle);
-    } else if (type === 'table') {
+  if (!items?.length) {
+    w_p.elements.push(getTextElement({ type: 'text', text: '' }));
+  } else {
+    for (let i = 0; i < items.length; i++) {
+      const node = items[i];
+      const { type } = node || {};
+      if (type === 'text') {
+        const textEle = getTextElement(node);
+        w_p.elements.push(textEle);
+      } else if (type === 'table') {
       //
-    } else if (type === 'image') {
+      } else if (type === 'image') {
       //
+      }
     }
   }
   return w_pPr;

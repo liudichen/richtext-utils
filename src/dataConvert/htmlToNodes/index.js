@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 16:11:27
- * @LastEditTime: 2022-10-26 22:51:02
+ * @LastEditTime: 2022-10-26 23:51:30
  */
 import { TAG } from '../../dataParse/constant';
 import { htmlToJson } from '../../dataParse/HtmltoJson';
@@ -44,10 +44,14 @@ const parseParagraph = (node) => {
   const data = [];
   let imgFirst = true;
   const paragraphParams = getParagraphParams(style);
-  const items = [];
+  let items = [];
   for (let i = 0; i < children.length; i++) {
     const child = children[i];
-    const { tagName } = child;
+    const { tagName, type, value } = child;
+    if (type === 'text') {
+      items.push({ type, text: value });
+      if (!data.length) imgFirst = false;
+    }
     if (tagName === 'span') {
       const result = [];
       parseSpan(child, {}, {}, result);
@@ -57,6 +61,7 @@ const parseParagraph = (node) => {
       data.push(parseImage(child));
     }
   }
+  items = items.filter((ele) => ele.type !== 'text' || ele.text !== '');
   if (imgFirst) {
     data.push({ ...paragraphParams, items });
   } else {
@@ -66,14 +71,33 @@ const parseParagraph = (node) => {
 };
 
 const parseLi = (li, lvl = 0, result = []) => {
-  for (let i = 0; i < li.children.length; i++) {
-    const node = li.children[i];
-    const { tagName, style, children } = node;
-    if (tagName === 'span') {
-      result.push(parseParagraph({ ...node, style: { ...style, 'mso-char-indent-count': `${lvl + 1}.0gd`, 'mso-para-margin-left': `${lvl}.0gd` } }));
-    } else if (tagName === 'ol' || tagName === 'ul') {
-      children.forEach((ele) => parseLi(ele, lvl + 1, result));
+  const { style = {}, children } = li;
+  const ou = [];
+  for (let i = 0; i < children.length; i++) {
+    if (children[i]?.tagName === 'ol' || children[i]?.tagName === 'ul') {
+      ou.push(i);
     }
+  }
+  if (ou.length) {
+    let start = 0;
+    let end = 0;
+    for (let i = 0; i < ou.length; i++) {
+      end = ou[i];
+      if (end > start) {
+        const p = parseParagraph({ ...li, children: children.slice(start, end), style: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } });
+        if (p.length) result.push(p[0]);
+      }
+      const lis = children[end].children;
+      lis.forEach((ele) => parseLi(ele, lvl + 1, result));
+      start = end + 1;
+    }
+    if (start < children.length) {
+      const p = parseParagraph({ ...li, children: children.slice(start), style: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } });
+      if (p.length) result.push(p[0]);
+    }
+  } else {
+    const p = parseParagraph({ ...li, style: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } });
+    if (p.length) result.push(p[0]);
   }
 };
 // 直接按悬挂缩进2个字符的段落处理，不会获得任何样式
@@ -84,6 +108,7 @@ const parseList = (node) => {
     const li = children[i];
     parseLi(li, 0, result);
   }
+  return result;
 };
 
 const parseHead = (node) => {
@@ -111,9 +136,11 @@ const parseNode = (node) => {
 
 export const htmlToNodes = (htmlStr) => {
   const jsonArr = htmlToJson(htmlStr, { skipComment: true, skipScript: true, skipStyle: true, keepInlineStyle: true, keepClass: false, keepRawInlineStyle: false, styleCamelCase: false });
+  console.log('jsonArr', jsonArr);
   const data = [];
   for (let i = 0; i < jsonArr.length; i++) {
     let node = parseNode(jsonArr[i]);
+    // console.log('node', i, node);
     if (!node) continue;
     if (Array.isArray(node)) { // 有一定的可能性是2层数组（figure导致的）
       node = node.filter(Boolean);

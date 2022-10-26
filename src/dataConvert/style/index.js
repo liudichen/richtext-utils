@@ -4,7 +4,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 11:00:03
- * @LastEditTime: 2022-10-26 22:40:19
+ * @LastEditTime: 2022-10-26 23:51:03
  */
 
 import { isAllChineseWord } from '../../judge';
@@ -43,12 +43,13 @@ export const lineAttributesHtmlToWordLineInfoNumber = (margin) => {
     if (!margin) return;
     margin = `${margin * 3 / 4}pt`;
   }
-  if (/^-?[\d.]+(cm|gd|pt|%)$/.test(margin)) return;
+  if (!/^-?[\d.]+(cm|gd|pt|%)$/.test(margin)) return;
   if (margin.endsWith('%')) {
     const number = +margin.slice(0, margin.length - 1);
     if (isNaN(number)) return;
     return Math.round(number * 240);
   }
+  console.log('margin1', margin);
   const number = +margin.slice(0, margin.length - 2);
   if (isNaN(number)) return;
   if (margin.endsWith('cm')) {
@@ -117,7 +118,7 @@ export const getFontFamily = (styles) => {
 export const getParagraphParams = (styles) => {
   const data = { type: 'p' };
   const keys = Object.keys(styles || {});
-  if (!keys.length) return {};
+  if (!keys.length) return data;
   if (styles?.pStyle) data.pStyle = styles.pStyle;
   // === w:pPr -> w:spacing ======
   if (true) {
@@ -187,14 +188,14 @@ export const getParagraphParams = (styles) => {
             data.firstLineChars = wordValue;
             data.firstLine = Math.round(wordValue / 100 * 210);
           } else {
-            data.hangingChars = wordValue;
-            data.hanging = Math.round(wordValue / 100 * 210);
+            data.hangingChars = -wordValue;
+            data.hanging = Math.round(wordValue / 100 * -210);
           }
         } else {
           if (wordValue > 0) {
             data.firstLine = wordValue;
           } else {
-            data.hanging = wordValue;
+            data.hanging = -wordValue;
           }
         }
       }
@@ -204,8 +205,8 @@ export const getParagraphParams = (styles) => {
         data.firstLineChars = value * 100;
         if (!data.firstLine) data.firstLine = Math.round(value * 210);
       } else if (value < 0) {
-        data.hangingChars = value * 100;
-        if (!data.hanging) data.hanging = Math.round(value * 210);
+        data.hangingChars = Math.round(value * -100);
+        if (!data.hanging) data.hanging = Math.round(value * -210);
       }
     }
   }
