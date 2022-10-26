@@ -4,7 +4,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 11:00:03
- * @LastEditTime: 2022-10-26 23:51:03
+ * @LastEditTime: 2022-10-27 00:08:11
  */
 
 import { isAllChineseWord } from '../../judge';
@@ -47,9 +47,8 @@ export const lineAttributesHtmlToWordLineInfoNumber = (margin) => {
   if (margin.endsWith('%')) {
     const number = +margin.slice(0, margin.length - 1);
     if (isNaN(number)) return;
-    return Math.round(number * 240);
+    return Math.round(number * 240 / 100);
   }
-  console.log('margin1', margin);
   const number = +margin.slice(0, margin.length - 2);
   if (isNaN(number)) return;
   if (margin.endsWith('cm')) {
@@ -57,7 +56,7 @@ export const lineAttributesHtmlToWordLineInfoNumber = (margin) => {
   }
   if (margin.endsWith('pt')) {
     if (number < 1) return;
-    return Math.random(number * 20);
+    return Math.round(number * 20);
   }
   // gd
   return Math.round(number * 100);
@@ -199,14 +198,15 @@ export const getParagraphParams = (styles) => {
           }
         }
       }
-    } else if (keys.includes('mso-char-indent-count')) {
+    }
+    if (keys.includes('mso-char-indent-count')) {
       const value = +styles['mso-char-indent-count'];
       if (value > 0) {
         data.firstLineChars = value * 100;
-        if (!data.firstLine) data.firstLine = Math.round(value * 210);
+        if (typeof data.firstLine === 'undefined') data.firstLine = Math.round(value * 210);
       } else if (value < 0) {
         data.hangingChars = Math.round(value * -100);
-        if (!data.hanging) data.hanging = Math.round(value * -210);
+        if (typeof data.hanging === 'undefined') data.hanging = Math.round(value * -210);
       }
     }
   }

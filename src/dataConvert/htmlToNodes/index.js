@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 16:11:27
- * @LastEditTime: 2022-10-26 23:51:30
+ * @LastEditTime: 2022-10-26 23:56:37
  */
 import { TAG } from '../../dataParse/constant';
 import { htmlToJson } from '../../dataParse/HtmltoJson';
@@ -112,7 +112,7 @@ const parseList = (node) => {
 };
 
 const parseHead = (node) => {
-  const { tagName, style } = node;
+  const { tagName, style = {} } = node;
   const lvl = tagName.slice(-1);
   return parseParagraph({ ...node, style: { ...style, pStyle: lvl } });
 };
