@@ -4,12 +4,9 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-24 17:05:08
- * @LastEditTime: 2022-10-26 08:47:46
+ * @LastEditTime: 2022-10-27 10:32:31
  */
-import {
-  TAG, TEXT, COMMENT,
-  selfCloseTagRegexp,
-} from '../constant';
+import { selfCloseTagRegexp, DefaultNodeStructOptions } from '../constant';
 
 const isPlainObject = (obj) => {
   return Object.prototype.toString.call(obj) === '[object Object]';
@@ -24,61 +21,62 @@ const setAttrs = (attrs, results) => {
   });
 };
 
-export const separatorCase = (key,separator='_') => {
-  let str = key ||'';
-  if(str.length && str.slice(0,1)===str.slice(0,1).toUpperCase()){
-    str = str.slice(0,1).toLowerCase()+str.slice(1)
+export const separatorCase = (key, separator = '_') => {
+  let str = key || '';
+  if (str.length && str.slice(0, 1) === str.slice(0, 1).toUpperCase()) {
+    str = str.slice(0, 1).toLowerCase() + str.slice(1);
   }
-  return str.replace(/([A-Z])/g, `${separator}$1`)
+  return str.replace(/([A-Z])/g, `${separator}$1`);
 };
 
-const toElement = (elementInfo, results) => {
+const toElement = (elementInfo, results, nodeStructOptions) => {
+  const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
   switch (elementInfo.type) {
-    case TAG:
-      const tagName = elementInfo.tagName;
+    case NODETAG:
+      const tagName = elementInfo[NODENAME];
       results.push('<', tagName);
-      let inlineStyle = elementInfo.inlineStyle;
-      if (!inlineStyle && elementInfo.style) {
-        const styleKeys = Object.keys(elementInfo.style);
+      let inlineStyle = elementInfo[INLINESTYLE];
+      if (!inlineStyle && elementInfo[STYLE]) {
+        const styleKeys = Object.keys(elementInfo[STYLE]);
         inlineStyle = '';
         for (let i = 0; i < styleKeys.length; i++) {
           const k = styleKeys[i];
-          inlineStyle += `${k}:${elementInfo.style[k]};`;
+          inlineStyle += `${k}:${elementInfo[STYLE][k]};`;
         }
       }
       if (inlineStyle) {
         results.push(' style="', inlineStyle, '"');
       }
-      if (elementInfo.classList?.length) {
-        results.push(' class="', elementInfo.classList.join(' '), '"');
+      if (elementInfo[CLASSLIST]?.length) {
+        results.push(' class="', elementInfo[CLASSLIST].join(' '), '"');
       }
-      setAttrs(elementInfo.attrs, results);
+      setAttrs(elementInfo[ATTRIBUTES], results);
       if (selfCloseTagRegexp.test(tagName)) {
         results.push(' />');
       } else {
         results.push('>');
-        if (Array.isArray(elementInfo.children)) {
-          elementInfo.children.forEach((item) => toElement(item, results));
+        if (Array.isArray(elementInfo[CHILDREN])) {
+          elementInfo[CHILDREN].forEach((item) => toElement(item, results, nodeStructOptions));
         }
         results.push('</', tagName, '>');
       }
       break;
-    case TEXT:
-      results.push(elementInfo.value);
+    case TEXTTAG:
+      results.push(elementInfo[TEXTVALUE]);
       break;
-    case COMMENT:
-      results.push('<!-- ', elementInfo.value, ' -->');
+    case COMMENTTAG:
+      results.push('<!-- ', elementInfo[COMMENTVALUE], ' -->');
       break;
     default:
         // ignore
   }
 };
-export const jsonToHtml = (json) => {
+export const jsonToHtml = (json, nodeStructOptions) => {
   json = json || [];
   if (isPlainObject(json)) {
     json = [ json ];
   }
   const results = [];
-  json.forEach((item) => toElement(item, results));
+  json.forEach((item) => toElement(item, results, nodeStructOptions));
   return results.join('');
 };

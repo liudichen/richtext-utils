@@ -3,21 +3,24 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 16:11:27
- * @LastEditTime: 2022-10-26 23:56:37
+ * @LastEditTime: 2022-10-27 12:36:41
  */
-import { TAG } from '../../dataParse/constant';
+import { DefaultNodeStructOptions } from '../../dataParse/constant';
 import { htmlToJson } from '../../dataParse/HtmltoJson';
 import { getParagraphParams } from '../style';
 import { getTextParams } from '../style';
-const parseImage = (node) => {
-  const { attrs, style } = node;
+
+const parseImage = (node, nodeStructOptions) => {
+  const { STYLE, ATTRIBUTES } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { [ATTRIBUTES]: attrs, [STYLE]: style } = node;
   return { type: 'image', ...attrs, style };
 };
-const parseSpan = (node, specailStyles = {}, parentStyles = {}, result = []) => {
-  const { tagName, type, style, value, children } = node;
-  if (type === 'text') {
+const parseSpan = (node, specailStyles = {}, parentStyles = {}, result = [], nodeStructOptions) => {
+  const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { [NODENAME]: tagName, type, [STYLE]: style, [TEXTVALUE]: text, [CHILDREN]: children } = node;
+  if (type === TEXTTAG) {
     const textParams = getTextParams({ ...parentStyles, ...specailStyles });
-    result.push({ type, text: value, ...textParams });
+    result.push({ type: 'text', text, ...textParams });
   } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName)) {
     const newSpecialStyles = { ...specailStyles };
     if (tagName === 'b' || tagName === 'strong') {
@@ -33,35 +36,38 @@ const parseSpan = (node, specailStyles = {}, parentStyles = {}, result = []) => 
     } else if (tagName === 'sup') {
       newSpecialStyles.sup = true;
     }
-    children.forEach((ele) => parseSpan(ele, newSpecialStyles, { ...parentStyles }, result));
+    children.forEach((ele) => parseSpan(ele, newSpecialStyles, { ...parentStyles }, result, nodeStructOptions));
   } else if (tagName === 'span') {
-    children.forEach((ele) => parseSpan(ele, { ...specailStyles }, { ...style }, result));
+    children.forEach((ele) => parseSpan(ele, { ...specailStyles }, { ...style }, result, nodeStructOptions));
+  } else if (tagName === 'img') {
+    result.push(parseImage(node, nodeStructOptions));
   }
 };
 
-const parseParagraph = (node) => {
-  const { children, style } = node;
+const parseParagraph = (node, nodeStructOptions) => {
+  const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { [CHILDREN]: children, [STYLE]: style } = node;
   const data = [];
   let imgFirst = true;
   const paragraphParams = getParagraphParams(style);
   let items = [];
   for (let i = 0; i < children.length; i++) {
     const child = children[i];
-    const { tagName, type, value } = child;
-    if (type === 'text') {
-      items.push({ type, text: value });
+    const { [NODENAME]: tagName, type, [TEXTVALUE]: text } = child;
+    if (type === TEXTTAG) {
+      items.push({ type, text });
       if (!data.length) imgFirst = false;
     }
     if (tagName === 'span') {
       const result = [];
-      parseSpan(child, {}, {}, result);
+      parseSpan(child, {}, {}, result, nodeStructOptions);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') {
-      data.push(parseImage(child));
+      data.push(parseImage(child, nodeStructOptions));
     }
   }
-  items = items.filter((ele) => ele.type !== 'text' || ele.text !== '');
+  items = items.filter((ele) => ele.type !== TEXTTAG || ele[TEXTVALUE] !== '');
   if (imgFirst) {
     data.push({ ...paragraphParams, items });
   } else {
@@ -70,11 +76,12 @@ const parseParagraph = (node) => {
   return data;
 };
 
-const parseLi = (li, lvl = 0, result = []) => {
-  const { style = {}, children } = li;
+const parseLi = (li, lvl = 0, result = [], nodeStructOptions) => {
+  const { NODENAME, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { [STYLE]: style = {}, [CHILDREN]: children } = li;
   const ou = [];
   for (let i = 0; i < children.length; i++) {
-    if (children[i]?.tagName === 'ol' || children[i]?.tagName === 'ul') {
+    if (children[i]?.[NODENAME] === 'ol' || children[i]?.[NODENAME] === 'ul') {
       ou.push(i);
     }
   }
@@ -84,62 +91,66 @@ const parseLi = (li, lvl = 0, result = []) => {
     for (let i = 0; i < ou.length; i++) {
       end = ou[i];
       if (end > start) {
-        const p = parseParagraph({ ...li, children: children.slice(start, end), style: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } });
+        const p = parseParagraph({ ...li, [CHILDREN]: children.slice(start, end), [STYLE]: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } }, nodeStructOptions);
         if (p.length) result.push(p[0]);
       }
-      const lis = children[end].children;
-      lis.forEach((ele) => parseLi(ele, lvl + 1, result));
+      const lis = children[end]?.[CHILDREN];
+      if (lis?.length) { lis.forEach((ele) => parseLi(ele, lvl + 1, result, nodeStructOptions)); }
       start = end + 1;
     }
     if (start < children.length) {
-      const p = parseParagraph({ ...li, children: children.slice(start), style: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } });
+      const p = parseParagraph({ ...li, [CHILDREN]: children.slice(start), [STYLE]: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } }, nodeStructOptions);
       if (p.length) result.push(p[0]);
     }
   } else {
-    const p = parseParagraph({ ...li, style: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } });
+    const p = parseParagraph({ ...li, [STYLE]: { ...style, 'mso-char-indent-count': `-${lvl + 1}.0`, 'mso-para-margin-left': `${lvl}.0gd` } }, nodeStructOptions);
     if (p.length) result.push(p[0]);
   }
 };
 // 直接按悬挂缩进2个字符的段落处理，不会获得任何样式
-const parseList = (node) => {
-  const { children } = node;
+const parseList = (node, nodeStructOptions) => {
+  const { CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { [CHILDREN]: children } = node;
   const result = [];
   for (let i = 0; i < children.length; i++) {
     const li = children[i];
-    parseLi(li, 0, result);
+    parseLi(li, 0, result, nodeStructOptions);
   }
   return result;
 };
 
-const parseHead = (node) => {
-  const { tagName, style = {} } = node;
+const parseHead = (node, nodeStructOptions) => {
+  const { NODENAME, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { [NODENAME]: tagName, [STYLE]: style = {} } = node;
   const lvl = tagName.slice(-1);
-  return parseParagraph({ ...node, style: { ...style, pStyle: lvl } });
+  return parseParagraph({ ...node, style: { ...style, pStyle: lvl } }, nodeStructOptions);
 };
 
-const parseTable = (node) => {
+const parseTable = (node, nodeStructOptions) => {
+  const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
 
 };
-const parseNode = (node) => {
-  const { type, tagName, children } = node;
-  if (type === TAG && [ 'o:p', 'figcaption' ].includes(tagName)) { return false; }
+const parseNode = (node, nodeStructOptions) => {
+  const { NODENAME, NODETAG, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { type, [NODENAME]: tagName, [CHILDREN]: children } = node;
+  if (type === NODETAG && [ 'o:p', 'figcaption' ].includes(tagName)) { return false; }
   if (tagName === 'figure') {
-    const res = children.map(parseNode).filter(Boolean);
+    const res = children.map((ele) => parseNode(ele, nodeStructOptions)).filter(Boolean);
     return res.length ? res : false;
   }
-  if (tagName === 'p') return parseParagraph(node);
-  if (tagName === 'table') return parseTable(node);
-  if (tagName === 'img') return parseImage(node);
-  if (tagName === 'ul' || tagName === 'ol') return parseList(node);
-  if (tagName && /^h[1-6]$/.test(tagName)) return parseHead(node);
+  if (tagName === 'p') return parseParagraph(node, nodeStructOptions);
+  if (tagName === 'table') return parseTable(node, nodeStructOptions);
+  if (tagName === 'img') return parseImage(node, nodeStructOptions);
+  if (tagName === 'ul' || tagName === 'ol') return parseList(node, nodeStructOptions);
+  if (tagName && /^h[1-6]$/.test(tagName)) return parseHead(node, nodeStructOptions);
 };
 
-export const htmlToNodes = (htmlStr) => {
-  const jsonArr = htmlToJson(htmlStr, { skipComment: true, skipScript: true, skipStyle: true, keepInlineStyle: true, keepClass: false, keepRawInlineStyle: false, styleCamelCase: false });
+export const htmlToNodes = (htmlStr, nodeStructOptions) => {
+  const jsonArr = htmlToJson(htmlStr, { skipComment: true, skipScript: true, skipStyle: true, keepInlineStyle: true, keepClass: false, keepRawInlineStyle: false, styleCamelCase: false }, nodeStructOptions);
   console.log('jsonArr', jsonArr);
   const data = [];
   for (let i = 0; i < jsonArr.length; i++) {
-    let node = parseNode(jsonArr[i]);
+    let node = parseNode(jsonArr[i], nodeStructOptions);
     // console.log('node', i, node);
     if (!node) continue;
     if (Array.isArray(node)) { // 有一定的可能性是2层数组（figure导致的）

@@ -3,12 +3,11 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-24 14:52:20
- * @LastEditTime: 2022-10-25 15:18:18
+ * @LastEditTime: 2022-10-27 11:03:07
  */
 import { Parser } from 'htmlparser2';
-import { TAG, COMMENT, TEXT,
-  scriptRegexp, styleRegexp, zeroValueRegexp, numberValueRegexp,
-} from '../constant';
+import { scriptRegexp, styleRegexp, zeroValueRegexp, numberValueRegexp, DefaultNodeStructOptions } from '../constant';
+
 
 const capitalize = (word) => {
   return (word || '').replace(/( |^)[a-z]/, (c) => c.toUpperCase());
@@ -43,8 +42,9 @@ export const inlineStyleToObject = (style, options) => {
   return styleObject;
 };
 
-export const htmlToJson = (html, options) => {
+export const htmlToJson = (html, options, nodeStructOptions) => {
   options = Object.assign({ skipStyle: false, keepInlineStyle: true, keepRawInlineStyle: false, skipScript: false, keepClass: true, keepAttributes: true, skipComment: false, styleCamelCase: true }, options);
+  const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
   const json = [];
   let levelNodes = [];
   const parser = new Parser({
@@ -54,12 +54,12 @@ export const htmlToJson = (html, options) => {
         node = false;
       } else {
         node = {
-          type: TAG,
-          tagName: name,
-          children: [],
+          type: NODETAG,
+          [NODENAME]: name,
+          [CHILDREN]: [],
         };
         if (options.keepClass) {
-          node.classList = (classNames || '').split(/\s+/).filter(Boolean);
+          node[CLASSLIST] = (classNames || '').split(/\s+/).filter(Boolean);
         }
         if (options.keepAttributes) {
           let keys = Object.keys(attrs);
@@ -67,25 +67,29 @@ export const htmlToJson = (html, options) => {
             keys = keys.filter(options.attributeNameFilter);
           }
           if (keys.length) {
-            node.attrs = { };
+            node[ATTRIBUTES] = { };
             for (let i = 0; i < keys.length; i++) {
               const k = keys[i];
-              node.attrs[k] = attrs[k];
+              node[ATTRIBUTES][k] = attrs[k];
             }
           }
         }
-        if (options.keepInlineStyle && style) {
-          const styleText = style.replace(/&quot;/g, '');
-          if (options.keepRawInlineStyle) {
-            node.inlineStyle = styleText;
+        if (options.keepInlineStyle) {
+          if (style) {
+            const styleText = style.replace(/&quot;/g, '');
+            if (options.keepRawInlineStyle) {
+              node[INLINESTYLE] = styleText;
+            }
+            node[STYLE] = inlineStyleToObject(styleText, { styleCamelCase: options.styleCamelCase, inlineStyleObjectConvert: options.inlineStyleObjectConvert });
+          } else {
+            node[STYLE] = {};
           }
-          node.style = inlineStyleToObject(styleText, { styleCamelCase: options.styleCamelCase, inlineStyleObjectConvert: options.inlineStyleObjectConvert });
         }
       }
       if (levelNodes[0]) {
         if (node !== false) {
           const parent = levelNodes[0];
-          parent.children.push(node);
+          parent[CHILDREN].push(node);
         }
         levelNodes.unshift(node);
       } else {
@@ -100,14 +104,14 @@ export const htmlToJson = (html, options) => {
       if (parent === false) {
         return;
       }
-      const node = { type: TEXT, value: text };
+      const node = { type: TEXTTAG, [TEXTVALUE]: text };
       if (!parent) {
         json.push(node);
       } else {
-        if (!parent.children) {
-          parent.children = [];
+        if (!parent[CHILDREN]) {
+          parent[CHILDREN] = [];
         }
-        parent.children.push(node);
+        parent[CHILDREN].push(node);
       }
     },
     oncomment(comments) {
@@ -119,16 +123,16 @@ export const htmlToJson = (html, options) => {
         return;
       }
       const node = {
-        type: COMMENT,
-        value: comments,
+        type: COMMENTTAG,
+        [COMMENTVALUE]: comments,
       };
       if (!parent) {
         json.push(node);
       } else {
-        if (!parent.children) {
-          parent.children = [];
+        if (!parent[CHILDREN]) {
+          parent[CHILDREN] = [];
         }
-        parent.children.push(node);
+        parent[CHILDREN].push(node);
       }
     },
     onclosetag() {

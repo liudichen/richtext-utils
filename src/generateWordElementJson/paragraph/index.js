@@ -5,19 +5,19 @@ import { getTextElement } from '../text';
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 23:24:33
- * @LastEditTime: 2022-10-26 23:53:49
+ * @LastEditTime: 2022-10-27 11:03:39
  */
-`
-      <w:pPr>
-        <w:spacing w:beforeLines="100" w:before="312" w:afterLines="100" w:after="312" w:line="480" w:lineRule="auto"/>
-        <w:ind w:leftChars="100" w:left="210" w:rightChars="100" w:right="210" w:firstLineChars="200" w:firstLine="480"/>
-        <w:jc w:val="left"/>
-        <w:rPr>
-          <w:rFonts w:ascii="黑体" w:eastAsia="黑体" w:hAnsi="黑体" w:hint="eastAsia"/>
-          <w:sz w:val="24"/>
-        </w:rPr>
-      </w:pPr>
-`;
+// `
+//       <w:pPr>
+//         <w:spacing w:beforeLines="100" w:before="312" w:afterLines="100" w:after="312" w:line="480" w:lineRule="auto"/>
+//         <w:ind w:leftChars="100" w:left="210" w:rightChars="100" w:right="210" w:firstLineChars="200" w:firstLine="480"/>
+//         <w:jc w:val="left"/>
+//         <w:rPr>
+//           <w:rFonts w:ascii="黑体" w:eastAsia="黑体" w:hAnsi="黑体" w:hint="eastAsia"/>
+//           <w:sz w:val="24"/>
+//         </w:rPr>
+//       </w:pPr>
+// `;
 
 export const getParagraphElement = (params) => {
   const {

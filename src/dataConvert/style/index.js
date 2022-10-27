@@ -1,30 +1,16 @@
+/* eslint-disable jsdoc/require-param */
 /* eslint-disable no-constant-condition */
 /*
  * @Description:
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 11:00:03
- * @LastEditTime: 2022-10-27 00:08:11
+ * @LastEditTime: 2022-10-27 11:43:39
  */
-
 import { isAllChineseWord } from '../../judge';
 import { htmlColorToWordColor } from '../color';
 
-// // html的line-height转化为word中的行距(行高)
-// export const lineHeightHtmlToWordLineNumber = (lineHeight) => {
-//   if (!lineHeight || typeof lineHeight !== 'string' || /^[\d.]+(%|pt)$/.test(lineHeight)) return;
-//   if (lineHeight.endsWith('pt')) {
-//     const number = +lineHeight.slice(0, lineHeight.length - 2);
-//     if (isNaN(number)) return;
-//     return Math.round(number * 20);
-//   }
-//   const number = +lineHeight.slice(0, lineHeight.length - 1);
-//   if (isNaN(number)) return;
-//   return Math.round(number * 24);
-// };
-
-// eslint-disable-next-line jsdoc/require-param
-/** html style 转 word xml属性
+/** html style的段落间距相关的尺寸大小转 word xml属性的数值大小
  * mso-para-margin-top： w:beforeLines
  * mso-para-margin-bottom： w:afterLines
  * mso-para-margin-right： gd-> w:ind-w:rightChars cm/pt -> w:ind-w:right
@@ -34,27 +20,27 @@ import { htmlColorToWordColor } from '../color';
  * text-indent:正数  w:ind-w:firstLine
  * mso-char-indent-count: w:ind-w:firstLineChars
  * **/
-export const lineAttributesHtmlToWordLineInfoNumber = (margin) => {
-  if (!margin) return;
-  if (typeof margin === 'number') margin = `${margin * 3 / 4}pt`;
-  if (typeof margin !== 'string') return;
-  if (margin.endsWith('px')) {
-    margin = +(margin.slice(0, margin.length - 2).trim());
-    if (!margin) return;
-    margin = `${margin * 3 / 4}pt`;
+export const htmlParagraphSizeToWordSizeNumber = (size) => {
+  if (!size) return;
+  if (typeof margin === 'number') size = `${size * 3 / 4}pt`;
+  if (typeof size !== 'string') return;
+  if (size.endsWith('px')) {
+    size = +(size.slice(0, size.length - 2).trim());
+    if (!size) return;
+    size = `${size * 3 / 4}pt`;
   }
-  if (!/^-?[\d.]+(cm|gd|pt|%)$/.test(margin)) return;
-  if (margin.endsWith('%')) {
-    const number = +margin.slice(0, margin.length - 1);
+  if (!/^-?[\d.]+(cm|gd|pt|%)$/.test(size)) return;
+  if (size.endsWith('%')) {
+    const number = +size.slice(0, size.length - 1);
     if (isNaN(number)) return;
     return Math.round(number * 240 / 100);
   }
-  const number = +margin.slice(0, margin.length - 2);
+  const number = +size.slice(0, size.length - 2);
   if (isNaN(number)) return;
-  if (margin.endsWith('cm')) {
+  if (size.endsWith('cm')) {
     return Math.round(number * 567);
   }
-  if (margin.endsWith('pt')) {
+  if (size.endsWith('pt')) {
     if (number < 1) return;
     return Math.round(number * 20);
   }
@@ -66,8 +52,8 @@ export const lineAttributesHtmlToWordLineInfoNumber = (margin) => {
 export const splitMargin = (margin) => {
   if (!margin || typeof margin !== 'string') return [];
   margin = margin.split(/[\s]+/);
-  if (margin.length > 4 || margin.length === 0) return [];
-  if (margin.length === 4) return margin;
+  if (margin.length === 0) return [];
+  if (margin.length >= 4) return margin.slice(0, 4);
   if (margin.length === 2) return [ margin[0], margin[1], [ margin[0], margin[1] ]];
   if (margin.length === 1) return [ margin[0], margin[0], margin[0], margin[0] ];
   return [ ...margin, margin[1] ];
@@ -100,17 +86,18 @@ export const htmlFontSizeToWordFontSizeNumber = (fontSize) => {
   }
   if (type === 'px') number = number * 3 / 4;
   if (type) number = number * 2;
-  return Math.random(number || 0);
+  return Math.round(number || 0);
 };
 
-export const getFontFamily = (styles) => {
+export const getFontFamily = (styles, onlyHans = true) => {
   if (!styles || typeof styles !== 'object') return;
   const keys = Object.keys(styles).filter((ele) => ele.includes('font-family'));
   if (!keys.length) return;
   const values = keys.map((ele) => styles[ele]);
   if (keys.includes('font-family')) return styles['font-family'];
-  //  暂时仅保留汉语字体
-  return values.find((ele) => isAllChineseWord(ele));
+  const hans = values.find((ele) => isAllChineseWord(ele));
+  if (onlyHans) return hans;
+  return hans || values[0];
 };
 
 // w:pPr [w:spacing, w:ind, w:jc, w:rPr [w:rFonts, w:sz,w:szCs]]
@@ -122,20 +109,20 @@ export const getParagraphParams = (styles) => {
   // === w:pPr -> w:spacing ======
   if (true) {
     if (keys.includes('line-height')) {
-      data.line = lineAttributesHtmlToWordLineInfoNumber(styles['line-height']);
+      data.line = htmlParagraphSizeToWordSizeNumber(styles['line-height']);
       if (styles['line-height-rule'] === 'exactly') data.lineRuleExact = true;
     }
     if (keys.includes('mso-para-margin-top')) {
-      data.beforeLines = lineAttributesHtmlToWordLineInfoNumber(styles['mso-para-margin-top']);
+      data.beforeLines = htmlParagraphSizeToWordSizeNumber(styles['mso-para-margin-top']);
     }
     if (keys.includes('margin-top')) {
-      data.before = lineAttributesHtmlToWordLineInfoNumber(styles['margin-top']);
+      data.before = htmlParagraphSizeToWordSizeNumber(styles['margin-top']);
     }
     if (keys.includes('mso-para-margin-bottom')) {
-      data.afterLines = lineAttributesHtmlToWordLineInfoNumber(styles['mso-para-margin-bottom']);
+      data.afterLines = htmlParagraphSizeToWordSizeNumber(styles['mso-para-margin-bottom']);
     }
     if (keys.includes('margin-bottom')) {
-      data.after = lineAttributesHtmlToWordLineInfoNumber(styles['margin-bottom']);
+      data.after = htmlParagraphSizeToWordSizeNumber(styles['margin-bottom']);
     }
   }
   // ====================
@@ -143,10 +130,10 @@ export const getParagraphParams = (styles) => {
   // ===== w:pPr -> w:ind =====
   if (true) {
   // eslint-disable-next-line no-unused-vars
-    const [ t, r, b, l ] = splitMargin(styles.margin).map(lineAttributesHtmlToWordLineInfoNumber);
+    const [ t, r, b, l ] = splitMargin(styles.margin).map(htmlParagraphSizeToWordSizeNumber);
     if (keys.includes('mso-para-margin-left')) {
       const value = styles['mso-para-margin-left'];
-      const wordValue = lineAttributesHtmlToWordLineInfoNumber(value);
+      const wordValue = htmlParagraphSizeToWordSizeNumber(value);
       if (value?.endsWith('gd')) {
         data.leftChars = wordValue;
         if (!keys.includes('margin-left') && !l) {
@@ -157,13 +144,13 @@ export const getParagraphParams = (styles) => {
       }
     }
     if (keys.includes('margin-left')) {
-      data.left = lineAttributesHtmlToWordLineInfoNumber(styles['margin-left']);
+      data.left = htmlParagraphSizeToWordSizeNumber(styles['margin-left']);
     } else if (l) {
       data.left = l;
     }
     if (keys.includes('mso-para-margin-right')) {
       const value = styles['mso-para-margin-right'];
-      const wordValue = lineAttributesHtmlToWordLineInfoNumber(value);
+      const wordValue = htmlParagraphSizeToWordSizeNumber(value);
       if (value?.endsWith('gd')) {
         data.rightChars = wordValue;
         if (!keys.includes('margin-right') && !r) {
@@ -174,13 +161,13 @@ export const getParagraphParams = (styles) => {
       }
     }
     if (keys.includes('margin-right')) {
-      data.right = lineAttributesHtmlToWordLineInfoNumber(styles['margin-right']);
+      data.right = htmlParagraphSizeToWordSizeNumber(styles['margin-right']);
     } else if (r) {
       data.left = r;
     }
     if (keys.includes('text-indent')) {
       const value = styles['text-indent'];
-      const wordValue = lineAttributesHtmlToWordLineInfoNumber(value);
+      const wordValue = htmlParagraphSizeToWordSizeNumber(value);
       if (wordValue) {
         if (value.endsWith('gd')) {
           if (wordValue > 0) {
