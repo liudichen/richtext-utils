@@ -3,17 +3,18 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 16:11:27
- * @LastEditTime: 2022-10-27 12:36:41
+ * @LastEditTime: 2022-10-27 12:43:27
  */
 import { DefaultNodeStructOptions } from '../../dataParse/constant';
 import { htmlToJson } from '../../dataParse/HtmltoJson';
 import { getParagraphParams } from '../style';
 import { getTextParams } from '../style';
 
-const parseImage = (node, nodeStructOptions) => {
-  const { STYLE, ATTRIBUTES } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+const parseImage = (node, nodeStructOptions, fromFigure) => {
+  const { STYLE, ATTRIBUTES, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
   const { [ATTRIBUTES]: attrs, [STYLE]: style } = node;
-  return { type: 'image', ...attrs, style };
+  const imgNode = { type: 'image', ...attrs, style };
+  return fromFigure ? { type: 'p', align: 'center', [CHILDREN]: imgNode } : imgNode;
 };
 const parseSpan = (node, specailStyles = {}, parentStyles = {}, result = [], nodeStructOptions) => {
   const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
@@ -126,21 +127,21 @@ const parseHead = (node, nodeStructOptions) => {
   return parseParagraph({ ...node, style: { ...style, pStyle: lvl } }, nodeStructOptions);
 };
 
-const parseTable = (node, nodeStructOptions) => {
+const parseTable = (node, nodeStructOptions, fromFigure) => {
   const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
 
 };
-const parseNode = (node, nodeStructOptions) => {
+const parseNode = (node, nodeStructOptions, fromFigure = false) => {
   const { NODENAME, NODETAG, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
   const { type, [NODENAME]: tagName, [CHILDREN]: children } = node;
   if (type === NODETAG && [ 'o:p', 'figcaption' ].includes(tagName)) { return false; }
   if (tagName === 'figure') {
-    const res = children.map((ele) => parseNode(ele, nodeStructOptions)).filter(Boolean);
+    const res = children.map((ele) => parseNode(ele, nodeStructOptions, true)).filter(Boolean);
     return res.length ? res : false;
   }
   if (tagName === 'p') return parseParagraph(node, nodeStructOptions);
-  if (tagName === 'table') return parseTable(node, nodeStructOptions);
-  if (tagName === 'img') return parseImage(node, nodeStructOptions);
+  if (tagName === 'table') return parseTable(node, nodeStructOptions, fromFigure);
+  if (tagName === 'img') return parseImage(node, nodeStructOptions, fromFigure);
   if (tagName === 'ul' || tagName === 'ol') return parseList(node, nodeStructOptions);
   if (tagName && /^h[1-6]$/.test(tagName)) return parseHead(node, nodeStructOptions);
 };
