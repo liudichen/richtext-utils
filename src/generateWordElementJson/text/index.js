@@ -3,11 +3,11 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 16:09:53
- * @LastEditTime: 2022-10-26 16:01:15
+ * @LastEditTime: 2022-10-27 13:57:23
  */
 import { camelCase } from '../../dataParse/HtmltoJson';
 
-export const getTextElement = (params) => {
+export const getTextXmlElementObj = (params) => {
   let {
     fontFamily, // 字体
     text, // 文本

@@ -3,13 +3,13 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 22:16:32
- * @LastEditTime: 2022-10-27 12:32:21
+ * @LastEditTime: 2022-10-27 14:45:27
  */
-export interface IWordXmlElement {
+export interface IWordXmlElementObj {
   type: 'element' | 'text',
   name: string,
   attributes?: object,
-  elements: IWordXmlElement[]
+  elements: IWordXmlElementObj[]
 }
 
 export interface IGetTextXmlElementParams {
@@ -48,8 +48,10 @@ export interface IGetTextXmlElementParams {
 
 export interface IGetImageXmlElementParams {
   type: 'image',
-  width?: number | string,
-  height?: number | string,
+  cx: number,
+  cy: number,
+  name?: string,
+  rId: number
 }
 
 export interface IGetTableXmlElementParams {

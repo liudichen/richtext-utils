@@ -1,11 +1,11 @@
-import { getTextElement } from '../text';
+import { getTextXmlElement } from '../text';
 
 /*
  * @Description:
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 23:24:33
- * @LastEditTime: 2022-10-27 11:03:39
+ * @LastEditTime: 2022-10-27 13:57:06
  */
 // `
 //       <w:pPr>
@@ -19,7 +19,7 @@ import { getTextElement } from '../text';
 //       </w:pPr>
 // `;
 
-export const getParagraphElement = (params) => {
+export const getParagraphXmlElementObj = (params) => {
   const {
     line, // 行距/行高，对应 line-height单位是%时是多倍行距，是pt时为固定行距
     lineRuleExact, // 是否时固定行距，如果固定时，style里会有line-height-rule:exactly
@@ -173,13 +173,13 @@ export const getParagraphElement = (params) => {
     w_p.elements.push(w_pPr);
   }
   if (!items?.length) {
-    w_p.elements.push(getTextElement({ type: 'text', text: '' }));
+    w_p.elements.push(getTextXmlElement({ type: 'text', text: '' }));
   } else {
     for (let i = 0; i < items.length; i++) {
       const node = items[i];
       const { type } = node || {};
       if (type === 'text') {
-        const textEle = getTextElement(node);
+        const textEle = getTextXmlElement(node);
         w_p.elements.push(textEle);
       } else if (type === 'table') {
       //
