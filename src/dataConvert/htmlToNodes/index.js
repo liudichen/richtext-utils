@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 16:11:27
- * @LastEditTime: 2022-10-27 12:43:27
+ * @LastEditTime: 2022-10-27 12:48:51
  */
 import { DefaultNodeStructOptions } from '../../dataParse/constant';
 import { htmlToJson } from '../../dataParse/HtmltoJson';
@@ -66,6 +66,12 @@ const parseParagraph = (node, nodeStructOptions) => {
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') {
       data.push(parseImage(child, nodeStructOptions));
+    } else if (tagName === 'figure') {
+      const source = child[CHILDREN].filter((ele) => ele[tagName] === 'img');
+      source.forEach((ele) => {
+        const imgNode = parseImage(ele, nodeStructOptions);
+        data.push(imgNode);
+      });
     }
   }
   items = items.filter((ele) => ele.type !== TEXTTAG || ele[TEXTVALUE] !== '');
