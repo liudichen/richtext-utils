@@ -3,17 +3,16 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-26 16:11:27
- * @LastEditTime: 2022-10-27 12:48:51
+ * @LastEditTime: 2022-10-27 15:33:20
  */
 import { DefaultNodeStructOptions } from '../../dataParse/constant';
 import { htmlToJson } from '../../dataParse/HtmltoJson';
-import { getParagraphParams } from '../style';
-import { getTextParams } from '../style';
+import { getImageStepOneParams, getParagraphParams, getTextParams } from '../style';
 
 const parseImage = (node, nodeStructOptions, fromFigure) => {
   const { STYLE, ATTRIBUTES, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
-  const { [ATTRIBUTES]: attrs, [STYLE]: style } = node;
-  const imgNode = { type: 'image', ...attrs, style };
+  const { [ATTRIBUTES]: attrs = {}, [STYLE]: style } = node;
+  const imgNode = getImageStepOneParams({ type: 'image', ...attrs, style });
   return fromFigure ? { type: 'p', align: 'center', [CHILDREN]: imgNode } : imgNode;
 };
 const parseSpan = (node, specailStyles = {}, parentStyles = {}, result = [], nodeStructOptions) => {

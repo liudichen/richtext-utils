@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 13:53:32
- * @LastEditTime: 2022-10-27 14:53:48
+ * @LastEditTime: 2022-10-27 15:02:24
  */
 const xmlns = {
   main2006: 'http://schemas.openxmlformats.org/drawingml/2006/main',
@@ -11,7 +11,7 @@ const xmlns = {
   pic2006: 'http://schemas.openxmlformats.org/drawingml/2006/picture',
 };
 
-export const ensureCxCy = (cx, cy, maxCx, maxCy) => {
+export const ensureCxCy = (cx, cy, maxCx = 5759450 * 0.9, maxCy) => {
   if (maxCx) {
     if (!maxCy) maxCy = maxCx;
   } else if (maxCy) {
