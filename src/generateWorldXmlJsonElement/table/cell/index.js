@@ -3,8 +3,10 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 20:07:33
- * @LastEditTime: 2022-10-27 22:18:22
+ * @LastEditTime: 2022-10-28 16:14:14
  */
+import { getParagraphXmlElementObj } from '../../paragraph';
+
 //  <w:tcBorders>
 //               <w:top w:val="single" w:sz="12" w:space="0" w:color="auto"/>
 //               <w:left w:val="single" w:sz="12" w:space="0" w:color="auto"/>
@@ -21,19 +23,43 @@ const getCellBordersXmlObj = (borders) => {
 const getTableCellXmlObj = (params) => {
   const {
     colspan, // 水平单元格合格
-    rowspan, // 垂直合并单元格
+    vMerge,
+    vMergeRestart,
+    content,
 
     width,
     borders,
     vAlign, // 单元格的垂直对齐方式， word里默认是top，html里默认是center,对应th，tc属性的vertical-align:bottom/top，center时style里没有。水平对齐由下面的段落控制。
   } = params || {};
-  const w_tcPr = { type: 'element', name: 'w:tcPr', elements: [] };
-  if (+width) w_tcPr.elements.push({ type: 'element', name: 'w:tcW', attributes: { 'w:w': `${width}`, 'w:type': 'dxa' } });
-  if (+rowspan) w_tcPr.elements.push({ type: 'element', name: 'w:vMerge', elements: [] });
+  const w_tcPr = { type: 'element', name: 'w:tcPr', elements: [
+    { type: 'element', name: 'w:tcW', attributes: { 'w:type': 'dxa' } },
+  ] };
+  if (+width) w_tcPr.elements[0].attributes['w:w'] = `${width}`;
+  if (vMergeRestart || vMergeRestart) {
+    const w_vMerge = { type: 'element', name: 'w:vMerge', elements: [] };
+    if (vMergeRestart) w_vMerge.attributes = { 'w:val': 'restart' };
+    w_tcPr.elements.push(w_vMerge);
+  }
   if (+colspan) w_tcPr.elements.push({ type: 'element', name: 'w:gridSpan', attributes: { 'w:val': `${colspan}` } });
   const w_tcBorders = getCellBordersXmlObj(borders);
   if (w_tcBorders) w_tcPr.elements.push(w_tcBorders);
   if (vAlign === 'center' || vAlign === 'bottom') w_tcPr.elements.push({ type: 'element', name: 'w:vAlign', attributes: { 'w:val': vAlign } });
+  const w_tc = { type: 'element', name: 'w:tc', elements: [
+    w_tcPr,
+  ] };
+  if (vMerge || !content?.length) {
+    w_tc.elements.push({
+
+    });
+  } else {
+    for (let i = 0; i < content.length; i++) {
+      const { type } = content[i];
+      if (type === 'p') {
+        w_tc.elements.push(getParagraphXmlElementObj(content[i]));
+      }
+    }
+  }
+  return w_tc;
 };
 
 // html中和word的xml文件明显差别：
