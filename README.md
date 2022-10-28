@@ -49,9 +49,11 @@ type jsonItem = textJsonItem | commentJsonItem | otherJsonItem;
 </code>
 </details>
 
-## Options
+## 注意
 
-TODO
+1. 处理过程中，所有图片均会被处理为内联样式，但是可能会包裹到段落里，因此实际可能不会跟其他文字或图片处于同一行。
+2. 由于粘贴到ckEditor后丢失了很多信息，导致无法恢复有序/无序列表状态，因此在转回Word时会直接将有序/无序列表处理为纯粹的段落，根据列表层级产生默认的缩进。
+3. 含img标签的元素转回word时由于需要其他处理
 
 ## LICENSE
 
