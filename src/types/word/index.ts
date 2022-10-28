@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 22:16:32
- * @LastEditTime: 2022-10-27 14:45:27
+ * @LastEditTime: 2022-10-28 10:25:43
  */
 export interface IWordXmlElementObj {
   type: 'element' | 'text',
@@ -46,6 +46,16 @@ export interface IGetTextXmlElementParams {
   kern?: string | number,
 }
 
+/** 生成的阶段1的图片信息 */
+export interface IImageStepOneResult {
+  type: 'image',
+  width?: string | number,
+  height?: string | number,
+  src?: string,
+  style?: object,
+}
+
+/** 最终传入生成xml图片节点的信息，注意：前端及step2之前均无法进入该状态 */
 export interface IGetImageXmlElementParams {
   type: 'image',
   cx: number,
