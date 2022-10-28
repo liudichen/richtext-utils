@@ -132,8 +132,8 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   return data;
 };
 
-export const paragraphHtmlJsonNodeParser = (node, nodeStructOptions) => {
-  const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+export const paragraphHtmlJsonNodeParser = (node, config) => {
+  const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [CHILDREN]: children, [STYLE]: style } = node;
   const data = [];
   let imgFirst = true;
@@ -148,15 +148,15 @@ export const paragraphHtmlJsonNodeParser = (node, nodeStructOptions) => {
     }
     if (tagName === 'span') {
       const result = [];
-      spanHtmlJsonNodeParser(child, {}, {}, result, nodeStructOptions);
+      spanHtmlJsonNodeParser(child, {}, {}, result, config);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素
-      items.push(imageHtmlJsonNodeParser(child, nodeStructOptions));
+      items.push(imageHtmlJsonNodeParser(child, config));
     } else if (tagName === 'figure') { // 块图片，直接拿到外面
       const source = child[CHILDREN].filter((ele) => ele[tagName] === 'img');
       source.forEach((ele) => {
-        const imgNode = imageHtmlJsonNodeParser(ele, nodeStructOptions);
+        const imgNode = imageHtmlJsonNodeParser(ele, config);
         data.push(imgNode);
       });
     }

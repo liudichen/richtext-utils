@@ -19,8 +19,8 @@ export const getImageElementStepOneParamsFromHtmlAttributes = (params) => {
   return data;
 };
 
-export const imageHtmlJsonNodeParser = (node, nodeStructOptions, fromFigure) => {
-  const { STYLE, ATTRIBUTES, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+export const imageHtmlJsonNodeParser = (node, config, fromFigure) => {
+  const { STYLE, ATTRIBUTES, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [ATTRIBUTES]: attrs = {}, [STYLE]: style } = node;
   const imgNode = getImageElementStepOneParamsFromHtmlAttributes({ type: 'image', ...attrs, style });
   return fromFigure ? { type: 'p', align: 'center', [CHILDREN]: imgNode } : imgNode;

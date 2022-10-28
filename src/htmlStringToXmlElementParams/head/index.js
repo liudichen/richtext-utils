@@ -8,9 +8,9 @@
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { paragraphHtmlJsonNodeParser } from '../paragraph';
 
-export const headHtmlJsonNodeParser = (node, nodeStructOptions) => {
-  const { NODENAME, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+export const headHtmlJsonNodeParser = (node, config) => {
+  const { NODENAME, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [NODENAME]: tagName, [STYLE]: style = {} } = node;
   const lvl = tagName.slice(-1);
-  return paragraphHtmlJsonNodeParser({ ...node, [STYLE]: { ...style, pStyle: lvl } }, nodeStructOptions);
+  return paragraphHtmlJsonNodeParser({ ...node, [STYLE]: { ...style, pStyle: lvl } }, config);
 };

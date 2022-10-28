@@ -42,9 +42,9 @@ export const inlineStyleToObject = (style, options) => {
   return styleObject;
 };
 
-export const htmlToJson = (html, options, nodeStructOptions) => {
+export const htmlToJson = (html, options, config) => {
   options = Object.assign({ skipStyle: false, keepInlineStyle: true, keepRawInlineStyle: false, skipScript: false, keepClass: true, keepAttributes: true, skipComment: false, styleCamelCase: true }, options);
-  const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+  const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const json = [];
   let levelNodes = [];
   const parser = new Parser({

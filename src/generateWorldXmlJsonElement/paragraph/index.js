@@ -1,11 +1,11 @@
-import { getTextXmlElement } from '../text';
+import { getTextXmlElementObj } from '../text';
 
 /*
  * @Description:
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 23:24:33
- * @LastEditTime: 2022-10-28 16:15:29
+ * @LastEditTime: 2022-10-28 20:30:29
  */
 // `
 //       <w:pPr>
@@ -19,7 +19,7 @@ import { getTextXmlElement } from '../text';
 //       </w:pPr>
 // `;
 
-export const getParagraphXmlElementObj = (params) => {
+export const getParagraphXmlElementObj = (params, config) => {
   const {
     line, // 行距/行高，对应 line-height单位是%时是多倍行距，是pt时为固定行距
     lineRuleExact, // 是否时固定行距，如果固定时，style里会有line-height-rule:exactly
@@ -38,15 +38,18 @@ export const getParagraphXmlElementObj = (params) => {
     hangingChars,
 
     align, // 对齐方式: left/center/right/justify/distribute，对用style为text-align,word默认是两端对齐justify，此时不需要插入内容
-    fontFamily,
+    fontFamily: fontFamilyProp,
     asciiFont, // w:ascii
     hAnsiFont, // w:hAnsi
     eastAsiaFont, // w:eastAsia
     csFont, // w:cs
-    fontSize,
+    fontSize: fontSizeProp,
     items,
     pStyle, // 预定义样式名，如标题等级
   } = params || {};
+  const { defaultFontSize, defaultFontFamily } = config || {};
+  const fontFamily = fontFamilyProp ?? defaultFontFamily;
+  const fontSize = fontSizeProp ?? defaultFontSize;
   let w_pStyle = null;
   if (pStyle) {
     w_pStyle = {
@@ -173,18 +176,18 @@ export const getParagraphXmlElementObj = (params) => {
     w_p.elements.push(w_pPr);
   }
   if (!items?.length) {
-    w_p.elements.push(getTextXmlElement({ type: 'text', text: '' }));
+    w_p.elements.push(getTextXmlElementObj({ type: 'text', text: '' }, config));
   } else {
     for (let i = 0; i < items.length; i++) {
       const node = items[i];
       const { type } = node || {};
       if (type === 'text') {
-        const textEle = getTextXmlElement(node);
+        const textEle = getTextXmlElementObj(node, config);
         w_p.elements.push(textEle);
       } else if (type === 'table') {
       //
       } else if (type === 'image') {
-      //
+        //
       }
     }
   }

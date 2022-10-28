@@ -3,14 +3,15 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 12:09:03
- * @LastEditTime: 2022-10-27 10:27:07
+ * @LastEditTime: 2022-10-28 20:24:10
  */
 type inlineStyleObjectConvertFn= (styleObject: object) => object;
 
 /** 节点对象结构配置
  * (主要是对应的type名称和各个属性的key值)
+ * ,以及传入默认的字体属性
  * */
-export interface INodeStructOptions {
+export interface INodeStructAndConvertConfig {
   /** 除文本和注释外其他节点的type值
    * ```
    * 最终节点对应的属性样式：
@@ -99,6 +100,15 @@ export interface INodeStructOptions {
    * @defaultValue 'inlineStyle'
    */
   INLINESTYLE?: string,
+
+  /** 普通段落的默认字体大小(是word的xml里的尺寸，是pt值的2倍) */
+  defaultFontSize?: number,
+  /** 普通段落的默认字体 */
+  defaultFontFamily?: string,
+  /** 表格中文字的默认字体 */
+  defaultTableFontFamily?: string,
+  /** 表格中文本的默认字体大小(是word的xml里的尺寸，是pt值的2倍) */
+  defaultTableFontSize?: number,
 }
 
 

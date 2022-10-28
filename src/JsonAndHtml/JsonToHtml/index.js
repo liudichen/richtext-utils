@@ -29,8 +29,8 @@ export const separatorCase = (key, separator = '_') => {
   return str.replace(/([A-Z])/g, `${separator}$1`);
 };
 
-const toElement = (elementInfo, results, nodeStructOptions) => {
-  const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+const toElement = (elementInfo, results, config) => {
+  const { NODENAME, NODETAG, TEXTTAG, TEXTVALUE, COMMENTTAG, COMMENTVALUE, CHILDREN, STYLE, CLASSLIST, ATTRIBUTES, INLINESTYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   switch (elementInfo.type) {
     case NODETAG:
       const tagName = elementInfo[NODENAME];
@@ -56,7 +56,7 @@ const toElement = (elementInfo, results, nodeStructOptions) => {
       } else {
         results.push('>');
         if (Array.isArray(elementInfo[CHILDREN])) {
-          elementInfo[CHILDREN].forEach((item) => toElement(item, results, nodeStructOptions));
+          elementInfo[CHILDREN].forEach((item) => toElement(item, results, config));
         }
         results.push('</', tagName, '>');
       }
@@ -71,12 +71,12 @@ const toElement = (elementInfo, results, nodeStructOptions) => {
         // ignore
   }
 };
-export const jsonToHtml = (json, nodeStructOptions) => {
+export const jsonToHtml = (json, config) => {
   json = json || [];
   if (isPlainObject(json)) {
     json = [ json ];
   }
   const results = [];
-  json.forEach((item) => toElement(item, results, nodeStructOptions));
+  json.forEach((item) => toElement(item, results, config));
   return results.join('');
 };

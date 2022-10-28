@@ -3,15 +3,15 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 16:09:53
- * @LastEditTime: 2022-10-27 13:57:23
+ * @LastEditTime: 2022-10-28 20:26:41
  */
 import { camelCase } from '../../dataParse/HtmltoJson';
 
-export const getTextXmlElementObj = (params) => {
+export const getTextXmlElementObj = (params, config) => {
   let {
-    fontFamily, // 字体
+    fontFamily: fontFamilyProp, // 字体
     text, // 文本
-    fontSize = 24, // 小四
+    fontSize: fontSizeProp, // 小四
     bold, // 加粗
     color, // 文字颜色
     italic, // 倾斜
@@ -23,6 +23,9 @@ export const getTextXmlElementObj = (params) => {
     // shd, // 文字底纹
     kern, // 字间距单位pt
   } = params || {};
+  const { defaultFontSize, defaultFontFamily } = config || {};
+  const fontFamily = fontFamilyProp ?? defaultFontFamily;
+  const fontSize = fontSizeProp ?? defaultFontSize;
   if (underline) underline = camelCase(underline);
   const w_r = {
     type: 'element',
@@ -66,8 +69,10 @@ export const getTextXmlElementObj = (params) => {
   if (color) {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:color', attributes: { 'w:val': color }, elements: [] });
   }
-  w_r.elements[0].elements.push({ type: 'element', name: 'w:sz', attributes: { 'w:val': `${fontSize}` }, elements: [] });
-  w_r.elements[0].elements.push({ type: 'element', name: 'w:szCs', attributes: { 'w:val': `${fontSize}` }, elements: [] });
+  if (fontSize) {
+    w_r.elements[0].elements.push({ type: 'element', name: 'w:sz', attributes: { 'w:val': `${fontSize}` }, elements: [] });
+    w_r.elements[0].elements.push({ type: 'element', name: 'w:szCs', attributes: { 'w:val': `${fontSize}` }, elements: [] });
+  }
   if (backgroundColor) {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:highlight', attributes: { 'w:val': `${backgroundColor}` }, elements: [] });
   }

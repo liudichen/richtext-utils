@@ -52,8 +52,8 @@ export const getTextElementParamsFromStyles = (styles) => {
   return data;
 };
 
-export const spanHtmlJsonNodeParser = (node, specailStyles = {}, parentStyles = {}, result = [], nodeStructOptions) => {
-  const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+export const spanHtmlJsonNodeParser = (node, specailStyles = {}, parentStyles = {}, result = [], config) => {
+  const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [NODENAME]: tagName, type, [STYLE]: style, [TEXTVALUE]: text, [CHILDREN]: children } = node;
   if (type === TEXTTAG) {
     const textParams = getTextElementParamsFromStyles({ ...parentStyles, ...specailStyles });
@@ -73,10 +73,10 @@ export const spanHtmlJsonNodeParser = (node, specailStyles = {}, parentStyles = 
     } else if (tagName === 'sup') {
       newSpecialStyles.sup = true;
     }
-    children.forEach((ele) => spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles }, result, nodeStructOptions));
+    children.forEach((ele) => spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles }, result, config));
   } else if (tagName === 'span') {
-    children.forEach((ele) => spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...style }, result, nodeStructOptions));
+    children.forEach((ele) => spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...style }, result, config));
   } else if (tagName === 'img') {
-    result.push(imageHtmlJsonNodeParser(node, nodeStructOptions));
+    result.push(imageHtmlJsonNodeParser(node, config));
   }
 };

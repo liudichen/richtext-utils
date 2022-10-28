@@ -5,6 +5,6 @@
  * @Date: 2022-10-28 10:35:01
  * @LastEditTime: 2022-10-28 10:35:45
  */
-import { IGetTableXmlElementParams, IJsonNodeItem, INodeStructOptions } from '../../types';
+import { IGetTableXmlElementParams, IJsonNodeItem, INodeStructAndConvertConfig } from '../../types';
 
-export const tableHtmlJsonNodeParser: (node: IJsonNodeItem, nodeStructOptions?: INodeStructOptions, fromFigure?: boolean) => IGetTableXmlElementParams;
+export const tableHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, fromFigure?: boolean) => IGetTableXmlElementParams;

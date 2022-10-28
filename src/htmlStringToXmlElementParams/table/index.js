@@ -10,13 +10,13 @@ import { htmlJsonNodeParser } from '..';
 import { paragraphHtmlJsonNodeParser } from '../paragraph';
 import { htmlSpacingSizeToWordSizeNumber } from '../../htmlStyleConvertToWordAttributes';
 
-const getTableCellContentXmlJsonParams = (content, nodeStructOptions) => {
-  const { NODENAME, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+const getTableCellContentXmlJsonParams = (content, config) => {
+  const { NODENAME, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   let data = [];
   if (!content.length || content.map((ele) => ele[NODENAME] === 'span') === content.length) {
-    data = paragraphHtmlJsonNodeParser({ type: 'p', [STYLE]: {}, [CHILDREN]: content }, nodeStructOptions);
+    data = paragraphHtmlJsonNodeParser({ type: 'p', [STYLE]: {}, [CHILDREN]: content }, config);
   } else {
-    data = content.map((ele) => htmlJsonNodeParser(ele, nodeStructOptions));
+    data = content.map((ele) => htmlJsonNodeParser(ele, config));
   }
   const result = [];
   for (let i = 0; i < data.length; i++) {
@@ -31,8 +31,8 @@ const getTableCellContentXmlJsonParams = (content, nodeStructOptions) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-export const tableHtmlJsonNodeParser = (node, nodeStructOptions) => {
-  const { NODENAME, CHILDREN, STYLE, ATTRIBUTES } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
+export const tableHtmlJsonNodeParser = (node, config) => {
+  const { NODENAME, CHILDREN, STYLE, ATTRIBUTES } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [CHILDREN]: blocks = [], [STYLE]: style = {}, [ATTRIBUTES]: attributes = {} } = node;
   const gridCols = [];
   let cols = 0;
@@ -82,7 +82,7 @@ export const tableHtmlJsonNodeParser = (node, nodeStructOptions) => {
       // ***********************
       // !!!!!!!! 预留位置： 边框处理
       // **********************
-      cellData.content = getTableCellContentXmlJsonParams(content, nodeStructOptions);
+      cellData.content = getTableCellContentXmlJsonParams(content, config);
       if (i === 0) {
         cols = cols + (+colspan || 1);
         gridCols.push(width);

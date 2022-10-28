@@ -1,6 +1,6 @@
-import { IGetParagraphXmlElementParams, IGetTableXmlElementParams, INodeStructOptions } from '../types';
+import { IGetParagraphXmlElementParams, IGetTableXmlElementParams, INodeStructAndConvertConfig } from '../types';
 
-export const htmlJsonNodeParser: (node, nodeStructOptions, fromFigure = false) => IGetParagraphXmlElementParams | IGetParagraphXmlElementParams[] | IGetTableXmlElementParams;
+export const htmlJsonNodeParser: (node, config, fromFigure = false) => IGetParagraphXmlElementParams | IGetParagraphXmlElementParams[] | IGetTableXmlElementParams;
 
 /** 将html字符串转换为待生成xml元素的参数 */
-export const htmlStringToXmlElementGenerateParams: (htmlStr: string, nodeStructOptions?: INodeStructOptions) => (IGetParagraphXmlElementParams | IGetTableXmlElementParams)[];
+export const htmlStringToXmlElementGenerateParams: (htmlStr: string, config?: INodeStructAndConvertConfig) => (IGetParagraphXmlElementParams | IGetTableXmlElementParams)[];

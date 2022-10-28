@@ -5,7 +5,7 @@
  * @Date: 2022-10-27 22:33:03
  * @LastEditTime: 2022-10-28 10:24:14
  */
-import { IImageStepOneResult, IGetParagraphXmlElementParams, IJsonNodeItem, INodeStructOptions } from '../../types';
+import { IImageStepOneResult, IGetParagraphXmlElementParams, IJsonNodeItem, INodeStructAndConvertConfig } from '../../types';
 
 interface IImageStepOneParam {
   type: 'image',
@@ -24,4 +24,4 @@ interface IImageStepOneParam {
 export const getImageElementStepOneParamsFromHtmlAttributes: (params: IImageStepOneResult) => IImageStepOneParam;
 
 /** 将html转化成的js对象转化为相应的待生成xml的节点参数对象 */
-export const imageHtmlJsonNodeParser: (node: IJsonNodeItem, nodeStructOptions?: INodeStructOptions, fromFigure?: boolean) => IGetParagraphXmlElementParams | IImageStepOneResult;
+export const imageHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, fromFigure?: boolean) => IGetParagraphXmlElementParams | IImageStepOneResult;
