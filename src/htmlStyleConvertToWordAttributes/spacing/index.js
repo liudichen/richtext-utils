@@ -12,7 +12,7 @@
  * **/
 export const htmlSpacingSizeToWordSizeNumber = (size) => {
   if (!size) return;
-  if (typeof margin === 'number') size = `${size * 3 / 4}pt`;
+  if (typeof size === 'number' || (typeof size === 'string' && /^[\d]+$/.test(size))) size = `${size}px`;
   if (typeof size !== 'string') return;
   if (size.endsWith('px')) {
     size = +(size.slice(0, size.length - 2).trim());
