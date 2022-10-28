@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:41:20
- * @LastEditTime: 2022-10-28 10:40:01
+ * @LastEditTime: 2022-10-28 14:56:03
  */
 import { DefaultNodeStructOptions, htmlToJson } from '../JsonAndHtml';
 import { paragraphHtmlJsonNodeParser } from './paragraph';
@@ -12,7 +12,7 @@ import { listHtmlJsonNodeParser } from './list';
 import { headHtmlJsonNodeParser } from './head';
 import { tableHtmlJsonNodeParser } from './table';
 
-const htmlJsonNodeParser = (node, nodeStructOptions, fromFigure = false) => {
+export const htmlJsonNodeParser = (node, nodeStructOptions, fromFigure = false) => {
   const { NODENAME, NODETAG, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, nodeStructOptions);
   const { type, [NODENAME]: tagName, [CHILDREN]: children } = node;
   if (type === NODETAG && [ 'o:p', 'figcaption' ].includes(tagName)) { return false; }

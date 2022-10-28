@@ -3,8 +3,10 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 22:16:32
- * @LastEditTime: 2022-10-28 10:25:43
+ * @LastEditTime: 2022-10-28 15:46:03
  */
+import { IGetTableXmlElementParams } from './table';
+
 export interface IWordXmlElementObj {
   type: 'element' | 'text',
   name: string,
@@ -64,10 +66,6 @@ export interface IGetImageXmlElementParams {
   rId: number
 }
 
-export interface IGetTableXmlElementParams {
-  type: 'table',
-}
-
 export interface IGetParagraphXmlElementParams {
   type: 'p',
   /** 行距/行高 */
@@ -113,3 +111,5 @@ export interface IGetParagraphXmlElementParams {
   /** 段落预定义样式，如标题等级 */
   pStyle?: string, // 预定义样式名，如标题等级
 }
+
+export * from './table';
