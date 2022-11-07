@@ -132,7 +132,7 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   return data;
 };
 
-export const paragraphHtmlJsonNodeParser = (node, config) => {
+export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoParamsFn) => {
   const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [CHILDREN]: children, [STYLE]: style } = node;
   const data = [];
@@ -152,13 +152,15 @@ export const paragraphHtmlJsonNodeParser = (node, config) => {
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素
-      items.push(imageHtmlJsonNodeParser(child, config));
+      const imgNode = await imageHtmlJsonNodeParser(child, config, false, getImageStepTwoParamsFn);
+      if (imgNode) { items.push(imgNode); }
     } else if (tagName === 'figure') { // 块图片，直接拿到外面
       const source = child[CHILDREN].filter((ele) => ele[tagName] === 'img');
-      source.forEach((ele) => {
-        const imgNode = imageHtmlJsonNodeParser(ele, config);
-        data.push(imgNode);
-      });
+      for (let j = 0; j < source?.length; j++) {
+        const ele = source[j];
+        const imgNode = await imageHtmlJsonNodeParser(ele, config, true, getImageStepTwoParamsFn);
+        if (imgNode) data.push(imgNode);
+      }
     }
   }
   // 清除没有文本内容的 text子项
