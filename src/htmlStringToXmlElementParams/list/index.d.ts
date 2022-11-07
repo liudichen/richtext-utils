@@ -3,12 +3,12 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 23:29:33
- * @LastEditTime: 2022-10-28 10:32:49
+ * @LastEditTime: 2022-11-07 15:00:21
  */
-import { IGetParagraphXmlElementParams, IJsonNodeItem, INodeStructAndConvertConfig } from '../../types';
+import { IGetImageStepTwoParamsFn, IGetParagraphXmlElementParams, IJsonNodeItem, INodeStructAndConvertConfig } from '../../types';
 
 /**
  * 将有html的有序列表无序列表转化为段落，会丢失列表属性，被处理成了普通段落。
  * 每1级按悬挂缩进2个字符，段落左侧缩进(lvl-1)*2个字符处理。
  */
-export const listHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig) => IGetParagraphXmlElementParams[];
+export const listHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<IGetParagraphXmlElementParams[]>;
