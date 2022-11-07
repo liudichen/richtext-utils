@@ -3,12 +3,12 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:43:21
- * @LastEditTime: 2022-11-07 15:54:19
+ * @LastEditTime: 2022-11-07 22:13:43
  */
 import { IGetImageStepTwoParamsFn, IGetTextXmlElementParams, IJsonNodeItem, INodeStructAndConvertConfig } from '../../types';
 
 /** 从style生成准备生成w:tr文本内容的参数，注意，该style经过处理包含了一些手动添加的诸如加粗、倾斜、下划线等属性 */
-export const getTextElementParamsFromStyles: (styles: object) => IGetTextXmlElementParams;
+export declare const getTextElementParamsFromStyles: (styles: object) => IGetTextXmlElementParams;
 
 interface ISpanSepcialStyles {
   bold?: boolean,
@@ -27,4 +27,4 @@ interface ISpanSepcialStyles {
  * @param result- 回调数组，用来递归存放结果
  * @param config- 节点对象的结构配置
  */
-export const spanHtmlJsonNodeParser: (node: IJsonNodeItem, specailStyles: ISpanSepcialStyles, parentStyles: object, result:[], config?: INodeStructAndConvertConfig, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<void>;
+export declare const spanHtmlJsonNodeParser: (node: IJsonNodeItem, specailStyles: ISpanSepcialStyles, parentStyles: object, result:[], config?: INodeStructAndConvertConfig, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<void>;

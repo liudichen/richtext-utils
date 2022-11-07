@@ -1,4 +1,3 @@
-
 /**
  * html style中段落间距相关的尺寸大小转 word xml属性的数值大小
  * ```
@@ -18,12 +17,12 @@
  * mso-char-indent-count: w:ind-w:firstLineChars
  * ```
  * */
-export const htmlSpacingSizeToWordSizeNumber: (size: string | number) => number | undefined;
+export declare const htmlSpacingSizeToWordSizeNumber: (size: string | number) => number | undefined;
 
 /** 将style里的margin字符串（可能有1-4个值）切分成4个，
  * ```
  * 结果：[上, 右, 下, 左] = [string, string, string, string]
  * ```
 */
-export const splitHtmlMarginString: (margin: string) => [string, string, string, string] | [];
+export declare const splitHtmlMarginString: (margin: string) => [string, string, string, string] | [];
 

@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 22:33:03
- * @LastEditTime: 2022-11-07 18:27:24
+ * @LastEditTime: 2022-11-07 22:13:22
  */
 import { IImageStepOneResult, IGetParagraphXmlElementParams, IJsonNodeItem, INodeStructAndConvertConfig, IImageStepTwoResult, IGetImageStepTwoParamsFn } from '../../types';
 
@@ -22,7 +22,7 @@ interface IImageStepOneParam {
  *  StepTwo就是获取cx,cy(如果有就不需要)及移动图片获取rId等操作，后续这些操作是在生成xml文档时进行的
  * ```
 */
-export const getImageElementStepOneParamsFromHtmlAttributes: (params: IImageStepOneResult) => IImageStepOneParam;
+export declare const getImageElementStepOneParamsFromHtmlAttributes: (params: IImageStepOneResult) => IImageStepOneParam;
 
 /** 将html转化成的js对象转化为相应的待生成xml的节点参数对象 */
-export const imageHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<IGetParagraphXmlElementParams | IImageStepTwoResult>;
+export declare const imageHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<IGetParagraphXmlElementParams | IImageStepTwoResult>;
