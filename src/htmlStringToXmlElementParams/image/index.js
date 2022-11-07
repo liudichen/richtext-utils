@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 22:31:15
- * @LastEditTime: 2022-10-28 10:01:25
+ * @LastEditTime: 2022-11-07 11:28:03
  */
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 
@@ -19,9 +19,10 @@ export const getImageElementStepOneParamsFromHtmlAttributes = (params) => {
   return data;
 };
 
-export const imageHtmlJsonNodeParser = (node, config, fromFigure) => {
+export const imageHtmlJsonNodeParser = async (node, config, fromFigure, getImageStepTwoParamsFn) => {
   const { STYLE, ATTRIBUTES, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [ATTRIBUTES]: attrs = {}, [STYLE]: style } = node;
-  const imgNode = getImageElementStepOneParamsFromHtmlAttributes({ type: 'image', ...attrs, style });
-  return fromFigure ? { type: 'p', align: 'center', [CHILDREN]: imgNode } : imgNode;
+  const imgStepOneNode = getImageElementStepOneParamsFromHtmlAttributes({ type: 'image', ...attrs, style });
+  const imgStepTwoPrams = await getImageStepTwoParamsFn?.(imgStepOneNode);
+  if (getImageStepTwoParamsFn) { return fromFigure ? { type: 'p', align: 'center', [CHILDREN]: imgStepTwoPrams } : imgStepTwoPrams; }
 };
