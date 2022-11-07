@@ -6,7 +6,7 @@ import { getTextXmlElementObj } from '../text';
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 23:24:33
- * @LastEditTime: 2022-11-07 11:32:57
+ * @LastEditTime: 2022-11-07 22:02:27
  */
 // `
 //       <w:pPr>
@@ -20,7 +20,7 @@ import { getTextXmlElementObj } from '../text';
 //       </w:pPr>
 // `;
 
-export const getParagraphXmlElementObj = async (params, config) => {
+export const getParagraphXmlElementObj = (params, config) => {
   const {
     line, // 行距/行高，对应 line-height单位是%时是多倍行距，是pt时为固定行距
     lineRuleExact, // 是否时固定行距，如果固定时，style里会有line-height-rule:exactly
