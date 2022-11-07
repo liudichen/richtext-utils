@@ -3,20 +3,28 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 23:39:38
- * @LastEditTime: 2022-10-28 16:03:05
+ * @LastEditTime: 2022-11-07 18:34:07
  */
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { htmlJsonNodeParser } from '..';
 import { paragraphHtmlJsonNodeParser } from '../paragraph';
 import { htmlSpacingSizeToWordSizeNumber } from '../../htmlStyleConvertToWordAttributes';
 
-const getTableCellContentXmlJsonParams = (content, config) => {
+const getTableCellContentXmlJsonParams = async (content, config, getImageStepTwoParamsFn) => {
   const { NODENAME, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   let data = [];
   if (!content.length || content.map((ele) => ele[NODENAME] === 'span') === content.length) {
-    data = paragraphHtmlJsonNodeParser({ type: 'p', [STYLE]: {}, [CHILDREN]: content }, config);
+    data = await paragraphHtmlJsonNodeParser({ type: 'p', [STYLE]: {}, [CHILDREN]: content }, config, getImageStepTwoParamsFn);
   } else {
-    data = content.map((ele) => htmlJsonNodeParser(ele, config));
+    for (let i = 0; i < content.length; i++) {
+      const ele = content[i];
+      const cellNode = await htmlJsonNodeParser(ele, config, getImageStepTwoParamsFn);
+      if (Array.isArray(cellNode)) {
+        data.push(...cellNode);
+      } else {
+        data.push(cellNode);
+      }
+    }
   }
   const result = [];
   for (let i = 0; i < data.length; i++) {
@@ -31,7 +39,7 @@ const getTableCellContentXmlJsonParams = (content, config) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-export const tableHtmlJsonNodeParser = (node, config) => {
+export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParamsFn) => {
   const { NODENAME, CHILDREN, STYLE, ATTRIBUTES } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [CHILDREN]: blocks = [], [STYLE]: style = {}, [ATTRIBUTES]: attributes = {} } = node;
   const gridCols = [];
@@ -82,7 +90,7 @@ export const tableHtmlJsonNodeParser = (node, config) => {
       // ***********************
       // !!!!!!!! 预留位置： 边框处理
       // **********************
-      cellData.content = getTableCellContentXmlJsonParams(content, config);
+      cellData.content = await getTableCellContentXmlJsonParams(content, config, getImageStepTwoParamsFn);
       if (i === 0) {
         cols = cols + (+colspan || 1);
         gridCols.push(width);

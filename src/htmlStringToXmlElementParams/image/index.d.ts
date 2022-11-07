@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 22:33:03
- * @LastEditTime: 2022-11-07 11:30:56
+ * @LastEditTime: 2022-11-07 18:27:24
  */
 import { IImageStepOneResult, IGetParagraphXmlElementParams, IJsonNodeItem, INodeStructAndConvertConfig, IImageStepTwoResult, IGetImageStepTwoParamsFn } from '../../types';
 
@@ -25,4 +25,4 @@ interface IImageStepOneParam {
 export const getImageElementStepOneParamsFromHtmlAttributes: (params: IImageStepOneResult) => IImageStepOneParam;
 
 /** 将html转化成的js对象转化为相应的待生成xml的节点参数对象 */
-export const imageHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, fromFigure?: boolean, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<IGetParagraphXmlElementParams | IImageStepTwoResult>;
+export const imageHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<IGetParagraphXmlElementParams | IImageStepTwoResult>;

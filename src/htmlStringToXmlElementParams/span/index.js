@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:43:15
- * @LastEditTime: 2022-10-28 10:18:44
+ * @LastEditTime: 2022-11-07 18:31:31
  */
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { getFontFamlyFromHtmlStyleObj, htmlColorToWordColor, htmlFontSizeToWordFontSizeNumber } from '../../htmlStyleConvertToWordAttributes';
@@ -52,7 +52,7 @@ export const getTextElementParamsFromStyles = (styles) => {
   return data;
 };
 
-export const spanHtmlJsonNodeParser = (node, specailStyles = {}, parentStyles = {}, result = [], config) => {
+export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentStyles = {}, result = [], config, getImageStepTwoParamsFn) => {
   const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [NODENAME]: tagName, type, [STYLE]: style, [TEXTVALUE]: text, [CHILDREN]: children } = node;
   if (type === TEXTTAG) {
@@ -73,10 +73,17 @@ export const spanHtmlJsonNodeParser = (node, specailStyles = {}, parentStyles = 
     } else if (tagName === 'sup') {
       newSpecialStyles.sup = true;
     }
-    children.forEach((ele) => spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles }, result, config));
+    for (let i = 0; i < children?.length; i++) {
+      const ele = children[i];
+      await spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles }, result, config, getImageStepTwoParamsFn);
+    }
   } else if (tagName === 'span') {
-    children.forEach((ele) => spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...style }, result, config));
+    for (let i = 0; i < children?.length; i++) {
+      const ele = children[i];
+      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...style }, result, config, getImageStepTwoParamsFn);
+    }
   } else if (tagName === 'img') {
-    result.push(imageHtmlJsonNodeParser(node, config));
+    const res = await imageHtmlJsonNodeParser(node, config, getImageStepTwoParamsFn);
+    result.push(res);
   }
 };

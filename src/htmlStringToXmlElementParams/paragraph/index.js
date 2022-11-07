@@ -148,19 +148,12 @@ export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoP
     }
     if (tagName === 'span') {
       const result = [];
-      spanHtmlJsonNodeParser(child, {}, {}, result, config);
+      await spanHtmlJsonNodeParser(child, {}, {}, result, config, getImageStepTwoParamsFn);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素
-      const imgNode = await imageHtmlJsonNodeParser(child, config, false, getImageStepTwoParamsFn);
+      const imgNode = await imageHtmlJsonNodeParser(child, config, getImageStepTwoParamsFn);
       if (imgNode) { items.push(imgNode); }
-    } else if (tagName === 'figure') { // 块图片，直接拿到外面
-      const source = child[CHILDREN].filter((ele) => ele[tagName] === 'img');
-      for (let j = 0; j < source?.length; j++) {
-        const ele = source[j];
-        const imgNode = await imageHtmlJsonNodeParser(ele, config, true, getImageStepTwoParamsFn);
-        if (imgNode) data.push(imgNode);
-      }
     }
   }
   // 清除没有文本内容的 text子项

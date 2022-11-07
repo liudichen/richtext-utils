@@ -19,10 +19,10 @@ export const getImageElementStepOneParamsFromHtmlAttributes = (params) => {
   return data;
 };
 
-export const imageHtmlJsonNodeParser = async (node, config, fromFigure, getImageStepTwoParamsFn) => {
-  const { STYLE, ATTRIBUTES, CHILDREN } = Object.assign({ ...DefaultNodeStructOptions }, config);
+export const imageHtmlJsonNodeParser = async (node, config, getImageStepTwoParamsFn) => {
+  const { STYLE, ATTRIBUTES } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [ATTRIBUTES]: attrs = {}, [STYLE]: style } = node;
   const imgStepOneNode = getImageElementStepOneParamsFromHtmlAttributes({ type: 'image', ...attrs, style });
   const imgStepTwoPrams = await getImageStepTwoParamsFn?.(imgStepOneNode);
-  if (getImageStepTwoParamsFn) { return fromFigure ? { type: 'p', align: 'center', [CHILDREN]: imgStepTwoPrams } : imgStepTwoPrams; }
+  if (getImageStepTwoParamsFn) { return imgStepTwoPrams; }
 };
