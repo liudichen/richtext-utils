@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 22:51:11
- * @LastEditTime: 2022-10-25 22:52:44
+ * @LastEditTime: 2022-11-07 10:15:10
  */
 
 /** 文本中是否含有中文字符 */
@@ -23,3 +23,6 @@ export const isHslColor: (color: string) => boolean;
 
 /** 判断是否为单词颜色 */
 export const isWordColor: (color: string) => boolean;
+
+/** 判断是否是base64图片 */
+export const isBase64Image: (str: string) => boolean;
