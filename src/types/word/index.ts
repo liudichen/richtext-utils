@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 22:16:32
- * @LastEditTime: 2022-10-28 15:46:03
+ * @LastEditTime: 2022-11-07 11:30:35
  */
 import { IGetTableXmlElementParams } from './table';
 
@@ -51,11 +51,20 @@ export interface IGetTextXmlElementParams {
 /** 生成的阶段1的图片信息 */
 export interface IImageStepOneResult {
   type: 'image',
-  width?: string | number,
-  height?: string | number,
+  cx?: string | number,
+  cy?: string | number,
   src?: string,
-  style?: object,
 }
+
+export interface IImageStepTwoResult {
+  type: 'image',
+  cx: number,
+  cy: number,
+  rId: number | string,
+  name?: string
+}
+
+export type IGetImageStepTwoParamsFn = (stepOneParmas: IImageStepOneResult) => Promise<IImageStepTwoResult>;
 
 /** 最终传入生成xml图片节点的信息，注意：前端及step2之前均无法进入该状态 */
 export interface IGetImageXmlElementParams {
