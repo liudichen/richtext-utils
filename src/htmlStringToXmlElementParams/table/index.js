@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 23:39:38
- * @LastEditTime: 2022-11-07 18:34:07
+ * @LastEditTime: 2022-11-07 19:59:40
  */
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { htmlJsonNodeParser } from '..';
@@ -53,9 +53,15 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
   if (tfoot?.[CHILDREN]?.length) { TRs = [ ...TRs, ...tfoot[CHILDREN].map((ele) => ({ ...ele, isFooter: true })) ]; }
   if (!TRs.length) return false;
   //  ===== ↓ table 属性 ↓ =====
-  const tableData = { type: 'table' };
+  const tableData = { type: 'table', cols: 0, width: 0 };
   if (attributes?.height || style?.height) {
     tableData.height = htmlSpacingSizeToWordSizeNumber(attributes?.height) || htmlSpacingSizeToWordSizeNumber(style?.height);
+  }
+  let colWidths = [];
+  if (+attributes.width) {
+    tableData.width = htmlSpacingSizeToWordSizeNumber(+attributes.width);
+  } else if (style.width) {
+    tableData.width = htmlSpacingSizeToWordSizeNumber(style.width);
   }
   const tableStruct = TRs.map(() => ({ type: 'tr', cells: [] }));
   // =====================
@@ -75,15 +81,21 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
       const { 'vertical-align': vAlign, width: widthS } = style || {};
       let { colspan, rowspan, width: widthA } = attributes || {};
       // ===== 处理单元格属性 =====
-      colspan = +colspan; rowspan = +rowspan;
-      if (colspan > 1) commonData.colspan = colspan;
-      // 单元格的垂直对齐方式， word里默认是top，html里默认是center,对应th，tc属性的vertical-align:bottom/top，center时style里没有。水平对齐由下面的段落控制。
-      if (vAlign !== 'top') { commonData.vAlign === vAlign || 'center'; }
       let width = 0;
       if (+widthA || widthS) {
         width = htmlSpacingSizeToWordSizeNumber(widthA) || htmlSpacingSizeToWordSizeNumber(widthS);
         commonData.width = width;
       }
+      colspan = +colspan; rowspan = +rowspan;
+      if (i === 0) {
+        if (colspan > 1 || !width) colWidths = null;
+        if (colWidths) colWidths.push(width);
+        tableData.cols = tableData.cols + (colspan > 1 ? colspan : 1);
+      }
+      if (colspan > 1) commonData.colspan = colspan;
+      // 单元格的垂直对齐方式， word里默认是top，html里默认是center,对应th，tc属性的vertical-align:bottom/top，center时style里没有。水平对齐由下面的段落控制。
+      if (vAlign !== 'top') { commonData.vAlign === vAlign || 'center'; }
+
       if (rowspan > 1) {
         cellData.vMergeRestart = true;
       }
@@ -105,5 +117,14 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
     }
   }
   tableData.rows = tableStruct;
+  if (colWidths && colWidths.length === tableData.cols) {
+    tableData.colWidths = colWidths;
+    if (!tableData.width) {
+      tableData.width = 0;
+      for (let i = 0; i < colWidths.length; i++) {
+        tableData.width = tableData.width + colWidths[i];
+      }
+    }
+  }
   return tableData;
 };

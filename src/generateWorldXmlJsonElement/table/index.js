@@ -3,8 +3,10 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 16:25:39
- * @LastEditTime: 2022-10-28 14:44:31
+ * @LastEditTime: 2022-11-07 20:26:49
  */
+
+import { getTableRowXmlObj } from './row';
 
 
 // 待处理，行高等属性，合并单元格的验证
@@ -37,3 +39,66 @@
             </w:tcBorders>
             <w:vAlign w:val="center"/>
           </w:tcPr>`;
+
+
+export const getTableXmlElementObj = (params) => {
+  const {
+    rows,
+    colWidths,
+    cols,
+    width,
+    // height,
+    ind,
+    layout = 'fixed',
+    align = 'center',
+    // borders,
+  } = params || {};
+  const w_tblGrid = {
+    type: 'element', name: 'w:tblGrid',
+    elements: [],
+  };
+  for (let i = 0; i < cols; i++) {
+    const w_gridCol = {
+      type: 'element', name: 'w:gridCol',
+      elements: [],
+    };
+    if (colWidths && colWidths?.length === cols) {
+      w_gridCol.attributes = { 'w:w': `${colWidths[i]}` };
+    }
+    w_tblGrid.elements.push(w_gridCol);
+  }
+  const w_tblPr = {
+    type: 'element', name: 'w:tblPr',
+    elements: [ ],
+  };
+  w_tblPr.elements.push({
+    type: 'element', name: 'w:tblW', elements: [],
+    attributes: width ? { 'w:w': `${width}`, 'w:type': 'dxa' } : { 'w:w': '0', 'w:type': 'auto' },
+  });
+  if (align) {
+    w_tblPr.elements.push({
+      type: 'element', name: 'w:jc', elements: [],
+      attributes: { 'w:val': align },
+    });
+  }
+  if (ind) {
+    w_tblPr.elements.push({
+      type: 'element', name: 'w:tblInd', elements: [],
+      attributes: { 'w:w': `${ind}`, 'w:type': 'dxa' },
+    });
+  }
+  if (layout) {
+    w_tblPr.elements.push({
+      type: 'element', name: 'w:tblLayout', elements: [],
+      attributes: { 'w:type': layout },
+    });
+  }
+  const w_tbl = {
+    type: 'element', name: 'w:tbl',
+    elements: [ w_tblPr, w_tblGrid ],
+  };
+  for (let i = 0; i < rows.length; i++) {
+    w_tbl.elements.push(getTableRowXmlObj(rows[i]));
+  }
+  return w_tbl;
+};

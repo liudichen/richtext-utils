@@ -3,9 +3,11 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 20:07:33
- * @LastEditTime: 2022-10-28 16:14:14
+ * @LastEditTime: 2022-11-07 19:45:53
  */
 import { getParagraphXmlElementObj } from '../../paragraph';
+import { getImageXmlElementObj } from '../../image';
+import { getTableXmlElementObj } from '../index';
 
 //  <w:tcBorders>
 //               <w:top w:val="single" w:sz="12" w:space="0" w:color="auto"/>
@@ -20,7 +22,7 @@ const getCellBordersXmlObj = (borders) => {
   return w_tcBorders;
 };
 
-const getTableCellXmlObj = (params) => {
+export const getTableCellXmlObj = (params) => {
   const {
     colspan, // 水平单元格合格
     vMerge,
@@ -56,10 +58,13 @@ const getTableCellXmlObj = (params) => {
       const { type } = content[i];
       if (type === 'p') {
         w_tc.elements.push(getParagraphXmlElementObj(content[i]));
+      } else if (type === 'image') {
+        w_tc.elements.push(getImageXmlElementObj(content[i]));
+      } else if (type === 'table') {
+        w_tc.elements.push(getTableXmlElementObj(content[i]));
       }
     }
-  }
-  return w_tc;
+  } return w_tc;
 };
 
 // html中和word的xml文件明显差别：

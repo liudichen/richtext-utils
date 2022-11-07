@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 15:59:10
- * @LastEditTime: 2022-11-06 18:25:22
+ * @LastEditTime: 2022-11-07 20:41:16
  */
 
 /*
@@ -30,3 +30,5 @@ export * from './paragraph';
 export * from './text';
 export * from './meta';
 export * from './constant';
+export * from './complex';
+export * from './table';
