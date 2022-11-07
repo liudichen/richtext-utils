@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 12:09:03
- * @LastEditTime: 2022-10-28 20:24:10
+ * @LastEditTime: 2022-11-07 09:56:37
  */
 type inlineStyleObjectConvertFn= (styleObject: object) => object;
 
@@ -109,6 +109,12 @@ export interface INodeStructAndConvertConfig {
   defaultTableFontFamily?: string,
   /** 表格中文本的默认字体大小(是word的xml里的尺寸，是pt值的2倍) */
   defaultTableFontSize?: number,
+  /** 图片的最大cx */
+  maxImgCx?: number,
+  /** 图片的最大cy */
+  maxImgCy?: number,
+  /** 图片的最大宽度 */
+  tableMaxWidth?: number
 }
 
 
