@@ -11,4 +11,4 @@ import { IGetImageXmlElementParams, IWordXmlElementObj } from '../../types';
 export const getImageXmlElementObj: (params: IGetImageXmlElementParams) => IWordXmlElementObj;
 
 /** 确保cx,cy不超出最大值 */
-export const ensureCxCy: (cx: number, cy: number, maxCx?: number, maxCy?: number) => ({ cx: number, cy: number });
+export const ensureImageCxCy: (cx: number, cy: number, maxCx?: number, maxCy?: number) => ({ cx: number, cy: number });
