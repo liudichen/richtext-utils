@@ -6,10 +6,10 @@
 ## Install
 
 ```bash
-$ npm install @iimm/richtext-utils
+npm install @iimm/richtext-utils
 ```
 
-## 包含的内容
+<!-- ## 包含的内容
 
 ### 数据处理
 
@@ -20,34 +20,7 @@ $ npm install @iimm/richtext-utils
 
 ### html与json格式转化工具
 1. jsonToHtml: (json: jsonItem | jsonItem[]) => string
-2. htmlToJson: (html: string, options?: htmlToJsonOptions) => jsonItem[];
-
-<details>
-<summary>json数组元素的类型</summary>
-<code>
-interface textJsonItem {
-  type: 'text',
-  value: string,
-}
-
-interface commentJsonItem {
-  type:'comment',
-  value: string,
-}
-
-interface otherJsonItem {
-  type: 'tag',
-  tagName: string,
-  classList?: string[],
-  attrs?: object,
-  inlineStyle?: string,
-  style?: object,
-  children: (otherJsonItem | textJsonItem | commentJsonItem)[]
-}
-
-type jsonItem = textJsonItem | commentJsonItem | otherJsonItem;
-</code>
-</details>
+2. htmlToJson: (html: string, options?: htmlToJsonOptions) => jsonItem[]; -->
 
 ## 注意
 
