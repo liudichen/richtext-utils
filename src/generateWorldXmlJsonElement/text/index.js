@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 16:09:53
- * @LastEditTime: 2022-11-08 10:45:19
+ * @LastEditTime: 2022-11-08 13:02:19
  */
 import { camelCase } from '../../JsonAndHtml';
 
@@ -87,4 +87,5 @@ export const getTextXmlElementObj = (params, config) => {
   } else if (sup) {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:vertAlign', attributes: { 'w:val': 'superscript' }, elements: [] });
   }
+  return w_r;
 };
