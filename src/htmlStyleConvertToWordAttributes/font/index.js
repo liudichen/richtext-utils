@@ -3,19 +3,30 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:35:05
- * @LastEditTime: 2022-10-28 09:40:02
+ * @LastEditTime: 2022-11-08 20:20:24
  */
 import { isAllChineseWord } from '../../judgeAndCompare';
 
-export const getFontFamlyFromHtmlStyleObj = (styles, onlyHans = true) => {
+export const getFontFamilyFromHtmlStyleObj = (styles, onlyHans = true) => {
   if (!styles || typeof styles !== 'object') return;
   const keys = Object.keys(styles).filter((ele) => ele.includes('font-family'));
   if (!keys.length) return;
   const values = keys.map((ele) => styles[ele]);
-  if (keys.includes('font-family')) return styles['font-family'];
+  let font;
+  if (keys.includes('font-family')) {
+    font = styles['font-family'];
+  }
   const hans = values.find((ele) => isAllChineseWord(ele));
-  if (onlyHans) return hans;
-  return hans || values[0];
+  if (onlyHans) {
+    font = hans;
+  } else {
+    font = values[0];
+  }
+  if (font) {
+    font = font.replace(/&quot;/g, '').replace(/"/g, '');
+    if (font.includes(',')) return font.split(',')[0];
+    return font;
+  }
 };
 
 export const htmlFontSizeToWordFontSizeNumber = (fontSize) => {
