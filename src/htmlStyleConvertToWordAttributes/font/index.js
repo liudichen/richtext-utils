@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:35:05
- * @LastEditTime: 2022-11-08 20:20:24
+ * @LastEditTime: 2022-11-08 20:33:18
  */
 import { isAllChineseWord } from '../../judgeAndCompare';
 
@@ -15,12 +15,13 @@ export const getFontFamilyFromHtmlStyleObj = (styles, onlyHans = true) => {
   let font;
   if (keys.includes('font-family')) {
     font = styles['font-family'];
-  }
-  const hans = values.find((ele) => isAllChineseWord(ele));
-  if (onlyHans) {
-    font = hans;
   } else {
-    font = values[0];
+    const hans = values.find((ele) => isAllChineseWord(ele));
+    if (onlyHans) {
+      font = hans;
+    } else {
+      font = values[0];
+    }
   }
   if (font) {
     font = font.replace(/&quot;/g, '').replace(/"/g, '');
