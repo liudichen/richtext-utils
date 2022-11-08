@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 20:07:33
- * @LastEditTime: 2022-11-08 21:40:14
+ * @LastEditTime: 2022-11-08 22:18:25
  */
 import { getParagraphXmlElementObj } from '../../paragraph';
 import { getImageXmlElementObj } from '../../image';
@@ -49,12 +49,15 @@ export const getTableCellXmlObj = (params) => {
   const w_tc = { type: 'element', name: 'w:tc', elements: [
     w_tcPr,
   ] };
-  if (vMerge || !content?.length) {
+  if (vMerge || !content?.length || !content.filter((ele) => !!ele).length) {
     w_tc.elements.push({
-
+      type: 'element',
+      name: 'w:p',
+      elements: [],
     });
   } else {
     for (let i = 0; i < content.length; i++) {
+      if (!content[i]) continue;
       const { type } = content[i];
       if (type === 'p') {
         w_tc.elements.push(getParagraphXmlElementObj(content[i]));
