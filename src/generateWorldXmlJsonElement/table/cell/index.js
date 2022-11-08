@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 20:07:33
- * @LastEditTime: 2022-11-07 19:45:53
+ * @LastEditTime: 2022-11-08 21:40:14
  */
 import { getParagraphXmlElementObj } from '../../paragraph';
 import { getImageXmlElementObj } from '../../image';
@@ -34,9 +34,9 @@ export const getTableCellXmlObj = (params) => {
     vAlign, // 单元格的垂直对齐方式， word里默认是top，html里默认是center,对应th，tc属性的vertical-align:bottom/top，center时style里没有。水平对齐由下面的段落控制。
   } = params || {};
   const w_tcPr = { type: 'element', name: 'w:tcPr', elements: [
-    { type: 'element', name: 'w:tcW', attributes: { 'w:type': 'dxa' } },
+    { type: 'element', name: 'w:tcW', attributes: { 'w:w': '0', 'w:type': 'auto' } },
   ] };
-  if (+width) w_tcPr.elements[0].attributes['w:w'] = `${width}`;
+  if (+width) { w_tcPr.elements[0].attributes = { 'w:w': `${width}`, 'w:type': 'dxa' }; }
   if (vMergeRestart || vMergeRestart) {
     const w_vMerge = { type: 'element', name: 'w:vMerge', elements: [] };
     if (vMergeRestart) w_vMerge.attributes = { 'w:val': 'restart' };

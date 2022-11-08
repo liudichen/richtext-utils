@@ -149,7 +149,6 @@ export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoP
     if (tagName === 'span') {
       const result = [];
       await spanHtmlJsonNodeParser(child, {}, {}, result, config, getImageStepTwoParamsFn);
-      console.log('outResult', result);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素

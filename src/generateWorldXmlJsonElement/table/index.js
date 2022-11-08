@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 16:25:39
- * @LastEditTime: 2022-11-07 20:26:49
+ * @LastEditTime: 2022-11-08 21:34:17
  */
 
 import { getTableRowXmlObj } from './row';
@@ -49,13 +49,15 @@ export const getTableXmlElementObj = (params) => {
     width,
     // height,
     ind,
-    layout = 'fixed',
+    layout,
     align = 'center',
     // borders,
   } = params || {};
   const w_tblGrid = {
     type: 'element', name: 'w:tblGrid',
-    elements: [],
+    elements: [
+      { type: 'element', name: 'w:tblStyles', attributes: { 'w:val': 'a6' }, elements: [] },
+    ],
   };
   for (let i = 0; i < cols; i++) {
     const w_gridCol = {
@@ -100,5 +102,8 @@ export const getTableXmlElementObj = (params) => {
   for (let i = 0; i < rows.length; i++) {
     w_tbl.elements.push(getTableRowXmlObj(rows[i]));
   }
-  return w_tbl;
+  return [
+    w_tbl,
+    { type: 'element', name: 'w:p', elements: [] },
+  ];
 };

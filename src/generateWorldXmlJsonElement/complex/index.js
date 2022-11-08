@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-11-07 09:48:31
- * @LastEditTime: 2022-11-07 20:35:29
+ * @LastEditTime: 2022-11-08 21:00:48
  */
 import { htmlStringToXmlElementGenerateParams } from '../../htmlStringToXmlElementParams';
 import { getImageXmlElementObj } from '../image';
@@ -42,12 +42,20 @@ export const htmlStringToXmlJsonElements = async (htmlStr, config, getImgStepTwo
     for (let j = 0; j < nodes.length; j++) {
       const node = nodes[j];
       const { type } = node;
+      let xmlElements = null;
       if (type === 'p') {
-        elements.push(getParagraphXmlElementObj(node));
+        xmlElements = getParagraphXmlElementObj(node);
       } else if (type === 'image') {
-        elements.push(getImageXmlElementObj(node));
+        xmlElements = getImageXmlElementObj(node);
       } else if (type === 'table') {
-        elements.push(getTableXmlElementObj(node));
+        xmlElements = getTableXmlElementObj(node);
+      }
+      if (xmlElements) {
+        if (Array.isArray(xmlElements)) {
+          elements.push(...xmlElements);
+        } else {
+          elements.push(xmlElements);
+        }
       }
     }
   }
