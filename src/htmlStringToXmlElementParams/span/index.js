@@ -3,17 +3,17 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:43:15
- * @LastEditTime: 2022-11-07 18:31:31
+ * @LastEditTime: 2022-11-08 20:21:05
  */
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
-import { getFontFamlyFromHtmlStyleObj, htmlColorToWordColor, htmlFontSizeToWordFontSizeNumber } from '../../htmlStyleConvertToWordAttributes';
+import { getFontFamilyFromHtmlStyleObj, htmlColorToWordColor, htmlFontSizeToWordFontSizeNumber } from '../../htmlStyleConvertToWordAttributes';
 import { imageHtmlJsonNodeParser } from '../image';
 
 export const getTextElementParamsFromStyles = (styles) => {
   const data = {};
   const keys = Object.keys(styles || {});
   if (!keys.length) return {};
-  data.fontFamily = getFontFamlyFromHtmlStyleObj(styles);
+  data.fontFamily = getFontFamilyFromHtmlStyleObj(styles);
   // w:kern
   if (keys.includes('mso-font-kerning')) {
     let kern = styles['mso-font-kerning'];
@@ -54,10 +54,10 @@ export const getTextElementParamsFromStyles = (styles) => {
 
 export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentStyles = {}, result = [], config, getImageStepTwoParamsFn) => {
   const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
-  const { [NODENAME]: tagName, type, [STYLE]: style, [TEXTVALUE]: text, [CHILDREN]: children } = node;
+  const { [NODENAME]: tagName, type, [STYLE]: style = {}, [TEXTVALUE]: text, [CHILDREN]: children } = node;
   if (type === TEXTTAG) {
-    const textParams = getTextElementParamsFromStyles({ ...parentStyles, ...specailStyles });
-    result.push({ type: 'text', text, ...textParams });
+    const textParams = getTextElementParamsFromStyles({ ...parentStyles, ...specailStyles, ...style, text });
+    result.push({ type: 'text', ...textParams });
   } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName)) {
     const newSpecialStyles = { ...specailStyles };
     if (tagName === 'b' || tagName === 'strong') {
@@ -75,12 +75,12 @@ export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentSty
     }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles }, result, config, getImageStepTwoParamsFn);
+      await spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles, ...style }, result, config, getImageStepTwoParamsFn);
     }
   } else if (tagName === 'span') {
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...style }, result, config, getImageStepTwoParamsFn);
+      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...parentStyles, ...style }, result, config, getImageStepTwoParamsFn);
     }
   } else if (tagName === 'img') {
     const res = await imageHtmlJsonNodeParser(node, config, getImageStepTwoParamsFn);
