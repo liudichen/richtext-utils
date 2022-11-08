@@ -3,9 +3,8 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 16:25:39
- * @LastEditTime: 2022-11-08 21:59:53
+ * @LastEditTime: 2022-11-08 23:04:49
  */
-
 import { getTableRowXmlObj } from './row';
 
 
@@ -40,7 +39,6 @@ import { getTableRowXmlObj } from './row';
             <w:vAlign w:val="center"/>
           </w:tcPr>`;
 
-
 export const getTableXmlElementObj = (params) => {
   const {
     rows,
@@ -51,7 +49,7 @@ export const getTableXmlElementObj = (params) => {
     ind,
     layout,
     align = 'center',
-    // borders,
+    borders,
   } = params || {};
   const w_tblGrid = {
     type: 'element', name: 'w:tblGrid',
@@ -82,6 +80,28 @@ export const getTableXmlElementObj = (params) => {
       type: 'element', name: 'w:jc', elements: [],
       attributes: { 'w:val': align },
     });
+  }
+  if (borders) {
+    const keys = Object.keys(borders);
+    if (keys.length) {
+      const w_tblBorders = {
+        type: 'element', name: 'w:tblBorders',
+        elements: [],
+      };
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const { val, sz, space, color } = borders[k];
+        const borderInfo = {
+          type: 'element', name: `w:${k}`, attributes: {},
+        };
+        if (val) borderInfo.attributes['w:val'] = val;
+        if (typeof sz !== 'undefined') borderInfo.attributes['w:sz'] = `${sz}`;
+        borderInfo.attributes['w:space'] = `${space || 0}`;
+        if (color) borderInfo.attributes['w:color'] = `${color}`;
+        w_tblBorders.elements.push(borderInfo);
+      }
+      w_tblPr.elements.push(w_tblBorders);
+    }
   }
   if (ind) {
     w_tblPr.elements.push({

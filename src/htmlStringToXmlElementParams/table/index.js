@@ -3,12 +3,93 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 23:39:38
- * @LastEditTime: 2022-11-08 21:57:45
+ * @LastEditTime: 2022-11-09 00:01:17
  */
-import { DefaultNodeStructOptions } from '../../JsonAndHtml';
+import { camelCase, DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { htmlJsonNodeParser } from '..';
 import { paragraphHtmlJsonNodeParser } from '../paragraph';
 import { htmlSpacingSizeToWordSizeNumber } from '../../htmlStyleConvertToWordAttributes';
+import { htmlColorToWordColor } from '../../htmlStyleConvertToWordAttributes';
+
+
+const parseStyleBorder = (value, inside) => {
+  let [ val, color, sz ] = value.split(/[\s]+/);
+  if (inside) {
+    [ sz, val, color ] = value.split(/[\s]+/);
+  }
+  if (color === 'windowtext') {
+    color = 'auto';
+  } else {
+    color = htmlColorToWordColor(color);
+  }
+  if (sz.endsWith('pt')) {
+    sz = +sz.slice(0, sz.length - 2) * 8;
+  } else {
+    sz = 2;
+  }
+  if (val === 'solid') {
+    val = 'single';
+  } else {
+    val = camelCase(val);
+  }
+  return {
+    sz, val, color,
+  };
+};
+
+
+const getTableBordersFromStyles = (styles) => {
+  const borders = {};
+  if (styles['mso-border-alt']) {
+    const altBorder = parseStyleBorder(styles['mso-border-alt']);
+    borders.top = borders.left = borders.bottom = borders.right = borders.insideH = borders.insideV = altBorder;
+  }
+  if (styles['mso-border-insideh']) {
+    borders.insideH = parseStyleBorder(styles['mso-border-insideh'], true);
+  }
+  if (styles['mso-border-insidev']) {
+    borders.insideV = parseStyleBorder(styles['mso-border-insidev'], true);
+  }
+  if (Object.keys(borders).length) { return borders; }
+};
+
+const getCellBorderFromStyles = (styles) => {
+  const borders = {};
+  let commonColor = styles['mso-border-color-alt'];
+  if (commonColor) {
+    commonColor = commonColor === 'windowtext' ? 'auto' : htmlColorToWordColor(commonColor);
+  }
+  let commmonStyle = styles['mso-border-alt'];
+  if (commmonStyle) commmonStyle = parseStyleBorder(commmonStyle);
+  const directions = [ 'top', 'bottom', 'right', 'left' ];
+  for (let i = 0; i < directions.length; i++) {
+    const direction = directions[i];
+    const value = styles[`mso-border-${direction}-alt`];
+    if (value) {
+      const attrs = value.split(/[\s]+/);
+      let [ val, color, sz ] = attrs;
+      if (attrs.length === 2 && commonColor) {
+        sz = color; color = commonColor;
+      }
+      val = val === 'solid' ? 'single' : camelCase(val);
+      if (sz?.endsWith('pt')) {
+        sz = +sz.slice(0, sz.length - 2) * 8;
+        // 平衡线条粗细，防止过粗
+        if (val !== 'single' && sz > 4)sz = 4;
+      } else {
+        sz = 2;
+      }
+      if (color === 'windowtext') {
+        color === 'auto';
+      } else {
+        color = htmlColorToWordColor(color);
+        if (!color) color = 'auto';
+      }
+      borders[direction] = { sz, color, val };
+    }
+  }
+  if (Object.keys(borders).length) return borders;
+};
 
 const getTableCellContentXmlJsonParams = async (content, config, getImageStepTwoParamsFn) => {
   const { NODENAME, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
@@ -35,7 +116,7 @@ const getTableCellContentXmlJsonParams = async (content, config, getImageStepTwo
       result.push(node);
     }
   }
-  return result;
+  return result.filter((ele) => !!ele);
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -57,6 +138,8 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
   if (attributes?.height || style?.height) {
     tableData.height = htmlSpacingSizeToWordSizeNumber(attributes?.height) || htmlSpacingSizeToWordSizeNumber(style?.height);
   }
+  const borders = getTableBordersFromStyles(style);
+  if (borders) tableData.borders = borders;
   const colWidths = [];
   if (+attributes.width) {
     tableData.width = htmlSpacingSizeToWordSizeNumber(+attributes.width);
@@ -75,7 +158,7 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
     if (row[STYLE]?.height) tableStruct[i].height = htmlSpacingSizeToWordSizeNumber(row[STYLE].height);
     // ======= ↑ ↑ =======
     for (let j = 0; j < cells.length; j++) {
-      const { [CHILDREN]: content, [STYLE]: style, [ATTRIBUTES]: attributes } = cells[j];
+      const { [CHILDREN]: content, [STYLE]: style = {}, [ATTRIBUTES]: attributes } = cells[j];
       const cellData = {};
       const commonData = {};
       const { 'vertical-align': vAlign, width: widthS } = style || {};
@@ -87,6 +170,8 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
         commonData.width = width;
       }
       colspan = +colspan; rowspan = +rowspan;
+      const cellBorders = getCellBorderFromStyles(style);
+      if (cellBorders) cellData.borders = cellBorders;
       if (i === 0) {
         if (colspan > 1 || !width) {
           for (let k = 0; k < (colspan || 1); k++) {

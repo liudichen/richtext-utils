@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 20:07:33
- * @LastEditTime: 2022-11-08 22:18:25
+ * @LastEditTime: 2022-11-08 23:52:13
  */
 import { getParagraphXmlElementObj } from '../../paragraph';
 import { getImageXmlElementObj } from '../../image';
@@ -18,7 +18,19 @@ import { getTableXmlElementObj } from '../index';
 const getCellBordersXmlObj = (borders) => {
   if (!borders || typeof borders !== 'object' || !Object.keys(borders).length) return;
   const w_tcBorders = { type: 'element', name: 'w:tcBorders', elements: [] };
-  // if(xxxx)
+  const keys = Object.keys(borders);
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
+    const { val, sz, space, color } = borders[k];
+    const borderInfo = {
+      type: 'element', name: `w:${k}`, attributes: {},
+    };
+    if (val) borderInfo.attributes['w:val'] = val;
+    if (typeof sz !== 'undefined') borderInfo.attributes['w:sz'] = `${sz}`;
+    borderInfo.attributes['w:space'] = `${space || 0}`;
+    if (color) borderInfo.attributes['w:color'] = `${color}`;
+    w_tcBorders.elements.push(borderInfo);
+  }
   return w_tcBorders;
 };
 
