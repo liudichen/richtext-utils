@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:43:15
- * @LastEditTime: 2022-11-08 20:21:05
+ * @LastEditTime: 2022-11-08 20:26:48
  */
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { getFontFamilyFromHtmlStyleObj, htmlColorToWordColor, htmlFontSizeToWordFontSizeNumber } from '../../htmlStyleConvertToWordAttributes';
@@ -35,7 +35,7 @@ export const getTextElementParamsFromStyles = (styles) => {
     data.color = htmlColorToWordColor(styles.color);
   }
   if (styles['font-size']) {
-    data.fontSize = htmlFontSizeToWordFontSizeNumber(styles['font-size']);
+    data.fontSize = htmlFontSizeToWordFontSizeNumber(styles['font-size']) * 2;
   }
   if (styles['background-color']) {
     data.backgroundColor = htmlColorToWordColor(styles['background-color']);
