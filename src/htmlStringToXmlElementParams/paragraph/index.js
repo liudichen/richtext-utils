@@ -113,7 +113,7 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   // ========================
   // ====== w:pPr -> w:jc
   if (keys.includes('text-align')) {
-    const align = styles['text-algin'];
+    const align = styles['text-align'];
     if (align === 'right' || align === 'center' || align === 'left') {
       data.align = align;
     } else if (align === 'justify' && (styles['text-align-last'] === 'justify' || styles['text-justify'] === 'distribute-all-lines')) {
@@ -134,7 +134,7 @@ export const getParagraphElementParamsFormStyles = (styles) => {
 
 export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoParamsFn) => {
   const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
-  const { [CHILDREN]: children, [STYLE]: style } = node;
+  const { [CHILDREN]: children, [STYLE]: style = {} } = node;
   const data = [];
   let imgFirst = true;
   const paragraphParams = getParagraphElementParamsFormStyles(style);
@@ -149,6 +149,7 @@ export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoP
     if (tagName === 'span') {
       const result = [];
       await spanHtmlJsonNodeParser(child, {}, {}, result, config, getImageStepTwoParamsFn);
+      console.log('outResult', result);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素
