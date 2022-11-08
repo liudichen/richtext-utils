@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 23:39:38
- * @LastEditTime: 2022-11-07 19:59:40
+ * @LastEditTime: 2022-11-08 21:57:45
  */
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { htmlJsonNodeParser } from '..';
@@ -57,7 +57,7 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
   if (attributes?.height || style?.height) {
     tableData.height = htmlSpacingSizeToWordSizeNumber(attributes?.height) || htmlSpacingSizeToWordSizeNumber(style?.height);
   }
-  let colWidths = [];
+  const colWidths = [];
   if (+attributes.width) {
     tableData.width = htmlSpacingSizeToWordSizeNumber(+attributes.width);
   } else if (style.width) {
@@ -88,8 +88,13 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
       }
       colspan = +colspan; rowspan = +rowspan;
       if (i === 0) {
-        if (colspan > 1 || !width) colWidths = null;
-        if (colWidths) colWidths.push(width);
+        if (colspan > 1 || !width) {
+          for (let k = 0; k < (colspan || 1); k++) {
+            colWidths.push(0);
+          }
+        } else {
+          colWidths.push(width);
+        }
         tableData.cols = tableData.cols + (colspan > 1 ? colspan : 1);
       }
       if (colspan > 1) commonData.colspan = colspan;
@@ -117,10 +122,10 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
     }
   }
   tableData.rows = tableStruct;
-  if (colWidths && colWidths.length === tableData.cols) {
-    tableData.colWidths = colWidths;
-    if (!tableData.width) {
-      tableData.width = 0;
+  tableData.colWidths = colWidths;
+  if (!tableData.width) {
+    tableData.width = 0;
+    if (!colWidths.find((ele) => !ele)) {
       for (let i = 0; i < colWidths.length; i++) {
         tableData.width = tableData.width + colWidths[i];
       }

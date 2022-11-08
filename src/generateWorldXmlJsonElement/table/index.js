@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-27 16:25:39
- * @LastEditTime: 2022-11-08 21:34:17
+ * @LastEditTime: 2022-11-08 21:59:53
  */
 
 import { getTableRowXmlObj } from './row';
@@ -64,7 +64,7 @@ export const getTableXmlElementObj = (params) => {
       type: 'element', name: 'w:gridCol',
       elements: [],
     };
-    if (colWidths && colWidths?.length === cols) {
+    if (colWidths?.[i]) {
       w_gridCol.attributes = { 'w:w': `${colWidths[i]}` };
     }
     w_tblGrid.elements.push(w_gridCol);
