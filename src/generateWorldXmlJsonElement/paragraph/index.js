@@ -6,7 +6,7 @@ import { getTextXmlElementObj } from '../text';
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 23:24:33
- * @LastEditTime: 2022-11-07 22:02:27
+ * @LastEditTime: 2022-11-08 20:37:30
  */
 // `
 //       <w:pPr>
@@ -167,10 +167,7 @@ export const getParagraphXmlElementObj = (params, config) => {
   const w_p = {
     type: 'element',
     name: 'w:p',
-    attributes: {
-      'w:rsidR': '00411124',
-      'w:rsidRDefault': '00411124',
-    },
+    attributes: {},
     elements: [ ],
   };
   if (w_pPr) {
