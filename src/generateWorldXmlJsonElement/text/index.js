@@ -3,9 +3,9 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-25 16:09:53
- * @LastEditTime: 2022-10-28 20:26:41
+ * @LastEditTime: 2022-11-08 10:45:19
  */
-import { camelCase } from '../../dataParse/HtmltoJson';
+import { camelCase } from '../../JsonAndHtml';
 
 export const getTextXmlElementObj = (params, config) => {
   let {
