@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 09:41:20
- * @LastEditTime: 2022-11-07 18:51:20
+ * @LastEditTime: 2022-11-08 20:58:09
  */
 import { DefaultNodeStructOptions, htmlToJson } from '../JsonAndHtml';
 import { paragraphHtmlJsonNodeParser } from './paragraph';
@@ -21,13 +21,13 @@ export const htmlJsonNodeParser = async (node, config, getImageStepTwoParamsFn) 
   if (tagName === 'figure') {
     const childs = children.filter((ele) => !/^fig/.test(ele[NODENAME]));
     if (!childs.length) return false;
-    if (!childs.find((ele) => ele[NODENAME] === 'p')) {
+    if (!childs.find((ele) => ele[NODENAME] === 'p' || ele[NODENAME] === 'table')) {
       return await paragraphHtmlJsonNodeParser(node, config, getImageStepTwoParamsFn);
     }
     const data = [];
     for (let i = 0; i < childs.length; i++) {
       const ele = childs[i];
-      let res = await headHtmlJsonNodeParser(ele, config, getImageStepTwoParamsFn);
+      let res = await htmlJsonNodeParser(ele, config, getImageStepTwoParamsFn);
       if (res) {
         if (!Array.isArray(res)) {
           data.push(res);
