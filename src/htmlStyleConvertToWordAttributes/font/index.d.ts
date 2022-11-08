@@ -16,4 +16,4 @@ export declare const htmlFontSizeToWordFontSizeNumber: (fontSize: string | numbe
  * @param onlyHans- 为真（默认）时，当没有font-family时是否从其他字体属性中找汉语字体，如果没有就不返回；为假时有限找汉语字体，没有就返回第1个字体
  * @returns 字体strng 或 undefined
  */
-export declare const getFontFamlyFromHtmlStyleObj: (styles: object, onlyHans?: boolean) => string | undefined;
+export declare const getFontFamilyFromHtmlStyleObj: (styles: object, onlyHans?: boolean) => string | undefined;

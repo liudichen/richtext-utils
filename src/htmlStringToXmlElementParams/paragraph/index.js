@@ -1,4 +1,4 @@
-import { htmlSpacingSizeToWordSizeNumber, splitHtmlMarginString, htmlFontSizeToWordFontSizeNumber, getFontFamlyFromHtmlStyleObj } from '../../htmlStyleConvertToWordAttributes';
+import { htmlSpacingSizeToWordSizeNumber, splitHtmlMarginString, htmlFontSizeToWordFontSizeNumber, getFontFamilyFromHtmlStyleObj } from '../../htmlStyleConvertToWordAttributes';
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { spanHtmlJsonNodeParser } from '../span';
 import { imageHtmlJsonNodeParser } from '../image';
@@ -128,7 +128,7 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   // ============================
 
   // ========== w:pPr -> w:rPr -> w:rFonts 暂时仅保留汉语字体
-  data.fontFamily = getFontFamlyFromHtmlStyleObj(styles);
+  data.fontFamily = getFontFamilyFromHtmlStyleObj(styles);
   return data;
 };
 
