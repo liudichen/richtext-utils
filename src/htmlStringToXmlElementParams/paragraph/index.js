@@ -41,15 +41,22 @@ export const getParagraphElementParamsFormStyles = (styles) => {
     data.after = htmlSpacingSizeToWordSizeNumber(styles['margin-bottom']);
   }
   // ====================
-
+  // ===============
+  // ===== w:pPr -> w:rPr -> w:sz/w:szCs
+  let fontSize = null;
+  if (keys.includes('font-size')) {
+    fontSize = htmlFontSizeToWordFontSizeNumber(styles['font-size']);
+    data.fontSize = fontSize;
+  }
+  // ============================
   // ===== w:pPr -> w:ind =====
   // eslint-disable-next-line no-unused-vars
   const [ t, r, b, l ] = splitHtmlMarginString(styles.margin).map(htmlSpacingSizeToWordSizeNumber);
   if (keys.includes('mso-para-margin-left')) {
     const value = styles['mso-para-margin-left'];
-    const wordValue = htmlSpacingSizeToWordSizeNumber(value);
-    if (value?.endsWith('gd')) {
-      data.leftChars = wordValue;
+    const wordValue = htmlSpacingSizeToWordSizeNumber(value, fontSize);
+    if (value?.endsWith('gd') || value.endsWith('em')) {
+      data.leftChars = Math.round(+(value.slice(0, value.length - 2)) * 100);
       if (!keys.includes('margin-left') && !l) {
         data.left = Math.round(wordValue / 100 * 210);
       }
@@ -58,15 +65,15 @@ export const getParagraphElementParamsFormStyles = (styles) => {
     }
   }
   if (keys.includes('margin-left')) {
-    data.left = htmlSpacingSizeToWordSizeNumber(styles['margin-left']);
+    data.left = htmlSpacingSizeToWordSizeNumber(styles['margin-left'], fontSize);
   } else if (l) {
     data.left = l;
   }
   if (keys.includes('mso-para-margin-right')) {
     const value = styles['mso-para-margin-right'];
-    const wordValue = htmlSpacingSizeToWordSizeNumber(value);
-    if (value?.endsWith('gd')) {
-      data.rightChars = wordValue;
+    const wordValue = htmlSpacingSizeToWordSizeNumber(value, fontSize);
+    if (value?.endsWith('gd') || value.endsWith('em')) {
+      data.rightChars = Math.round(+(value.slice(0, value.length - 2)) * 100);
       if (!keys.includes('margin-right') && !r) {
         data.right = Math.round(wordValue / 100 * 210);
       }
@@ -75,20 +82,20 @@ export const getParagraphElementParamsFormStyles = (styles) => {
     }
   }
   if (keys.includes('margin-right')) {
-    data.right = htmlSpacingSizeToWordSizeNumber(styles['margin-right']);
+    data.right = htmlSpacingSizeToWordSizeNumber(styles['margin-right'], fontSize);
   } else if (r) {
     data.left = r;
   }
   if (keys.includes('text-indent')) {
     const value = styles['text-indent'];
-    const wordValue = htmlSpacingSizeToWordSizeNumber(value);
+    const wordValue = htmlSpacingSizeToWordSizeNumber(value, fontSize);
     if (wordValue) {
-      if (value.endsWith('gd')) {
+      if (value.endsWith('gd') || value.endsWith('em')) {
         if (wordValue > 0) {
-          data.firstLineChars = wordValue;
+          data.firstLineChars = Math.round(+(value.slice(0, value.length - 2)) * 100);
           data.firstLine = Math.round(wordValue / 100 * 210);
         } else {
-          data.hangingChars = -wordValue;
+          data.hangingChars = Math.round(+(value.slice(0, value.length - 2)) * -100);
           data.hanging = Math.round(wordValue / 100 * -210);
         }
       } else {
@@ -104,10 +111,10 @@ export const getParagraphElementParamsFormStyles = (styles) => {
     const value = +styles['mso-char-indent-count'];
     if (value > 0) {
       data.firstLineChars = value * 100;
-      if (typeof data.firstLine === 'undefined') data.firstLine = Math.round(value * 210);
+      if (typeof data.firstLine === 'undefined') data.firstLine = fontSize ? Math.round(value * fontSize * 20) : Math.round(value * 210);
     } else if (value < 0) {
       data.hangingChars = Math.round(value * -100);
-      if (typeof data.hanging === 'undefined') data.hanging = Math.round(value * -210);
+      if (typeof data.hanging === 'undefined') data.hanging = fontSize ? Math.round(value * fontSize * -20) : Math.round(value * -210);
     }
   }
   // ========================
@@ -120,12 +127,6 @@ export const getParagraphElementParamsFormStyles = (styles) => {
       data.align = 'distribute';
     }
   }
-  // ===============
-  // ===== w:pPr -> w:rPr -> w:sz/w:szCs
-  if (keys.includes('font-size')) {
-    data.fontSize = htmlFontSizeToWordFontSizeNumber(styles['font-size']);
-  }
-  // ============================
 
   // ========== w:pPr -> w:rPr -> w:rFonts 暂时仅保留汉语字体
   data.fontFamily = getFontFamilyFromHtmlStyleObj(styles);

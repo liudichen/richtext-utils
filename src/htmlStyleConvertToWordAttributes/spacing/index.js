@@ -3,7 +3,7 @@
  * @Author: 柳涤尘 https://www.iimm.ink
  * @LastEditors: 柳涤尘 liudichen@foxmail.com
  * @Date: 2022-10-28 20:14:21
- * @LastEditTime: 2022-11-12 17:10:43
+ * @LastEditTime: 2022-11-12 17:44:59
  */
 /* eslint-disable jsdoc/require-param */
 
@@ -17,7 +17,7 @@
  * text-indent:正数  w:ind-w:firstLine
  * mso-char-indent-count: w:ind-w:firstLineChars
  * **/
-export const htmlSpacingSizeToWordSizeNumber = (size) => {
+export const htmlSpacingSizeToWordSizeNumber = (size, wordPtFontSize) => {
   if (!size) return;
   if (typeof size === 'number' || (typeof size === 'string' && /^[\d]+$/.test(size))) size = `${size}px`;
   if (typeof size !== 'string') return;
@@ -42,7 +42,7 @@ export const htmlSpacingSizeToWordSizeNumber = (size) => {
     return Math.round(number * 20);
   }
   // gd/em
-  return Math.round(number * 100);
+  return wordPtFontSize ? Math.round(wordPtFontSize * number * 20) : Math.round(number * 100);
 };
 
 // 上 右 下 左

@@ -1,5 +1,13 @@
+/*
+ * @Description:
+ * @Author: 柳涤尘 https://www.iimm.ink
+ * @LastEditors: 柳涤尘 liudichen@foxmail.com
+ * @Date: 2022-10-28 20:14:21
+ * @LastEditTime: 2022-11-12 17:43:59
+ */
 /**
  * html style中段落间距相关的尺寸大小转 word xml属性的数值大小
+ * @param wordPtFontSize - 可选,用于辅助处理单位为gd或em时的缩进大小
  * ```
  *  支持格式：
  * 1. 数字(视为px)
@@ -17,7 +25,7 @@
  * mso-char-indent-count: w:ind-w:firstLineChars
  * ```
  * */
-export declare const htmlSpacingSizeToWordSizeNumber: (size: string | number) => number | undefined;
+export declare const htmlSpacingSizeToWordSizeNumber: (size: string | number, wordPtFontSize?: number) => number | undefined;
 
 /** 将style里的margin字符串（可能有1-4个值）切分成4个，
  * ```
