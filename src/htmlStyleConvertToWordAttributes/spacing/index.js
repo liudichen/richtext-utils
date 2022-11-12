@@ -1,3 +1,10 @@
+/*
+ * @Description:
+ * @Author: 柳涤尘 https://www.iimm.ink
+ * @LastEditors: 柳涤尘 liudichen@foxmail.com
+ * @Date: 2022-10-28 20:14:21
+ * @LastEditTime: 2022-11-12 17:10:43
+ */
 /* eslint-disable jsdoc/require-param */
 
 /** html style的段落间距相关的尺寸大小转 word xml属性的数值大小
@@ -19,7 +26,7 @@ export const htmlSpacingSizeToWordSizeNumber = (size) => {
     if (!size) return;
     size = `${size * 3 / 4}pt`;
   }
-  if (!/^-?[\d.]+(cm|gd|pt|%)$/.test(size)) return;
+  if (!/^-?[\d.]+(cm|gd|em|pt|%)$/.test(size)) return;
   if (size.endsWith('%')) {
     const number = +size.slice(0, size.length - 1);
     if (isNaN(number)) return;
@@ -34,7 +41,7 @@ export const htmlSpacingSizeToWordSizeNumber = (size) => {
     if (number < 1) return;
     return Math.round(number * 20);
   }
-  // gd
+  // gd/em
   return Math.round(number * 100);
 };
 
