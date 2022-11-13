@@ -22,6 +22,8 @@ export const getTextXmlElementObj = (params, config) => {
     sup, // 上标
     // shd, // 文字底纹
     kern, // 字间距单位pt
+    border, // 文本外框
+    borderColor,
   } = params || {};
   const { defaultFontSize, defaultFontFamily } = config || {};
   const fontFamily = fontFamilyProp ?? defaultFontFamily;
@@ -78,6 +80,14 @@ export const getTextXmlElementObj = (params, config) => {
   }
   if (underline) {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:u', attributes: { 'w:val': 'underline' }, elements: [] });
+  }
+  if (border) {
+    w_r.elements[0].elements.push({
+      type: 'element', name: 'w:bdr', elements: [],
+      attributes: {
+        'w:val': 'single', 'w:sz': '4', 'w:space': '0', 'w:color': borderColor || 'auto',
+      },
+    });
   }
   // if (shd) {
   //   w_r.elements[0].elements.push({ type: 'element', name: 'w:shd', attributes: { 'w:val': 'pct15', 'w:color': 'auto', 'w:fill': 'FFFFFF' }, elements: [] });

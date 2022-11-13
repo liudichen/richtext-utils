@@ -48,6 +48,14 @@ export const getTextElementParamsFromStyles = (styles) => {
   } else if (styles.sup === true) {
     data.sup = true;
   }
+  if (styles.border) {
+    data.border = true;
+    const arr = styles.border.split(/[\w]+/);
+    const color = arr[arr.length - 1];
+    if (color !== 'windowtext') {
+      data.borderColor = htmlColorToWordColor(color);
+    }
+  }
   data.text = (styles.text || '').replace(/&nbsp;/g, ' ');
   return data;
 };
@@ -58,7 +66,7 @@ export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentSty
   if (type === TEXTTAG) {
     const textParams = getTextElementParamsFromStyles({ ...parentStyles, ...specailStyles, ...style, text });
     result.push({ type: 'text', ...textParams });
-  } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName)) {
+  } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName) || style.border) {
     const newSpecialStyles = { ...specailStyles };
     if (tagName === 'b' || tagName === 'strong') {
       newSpecialStyles.bold = true;
@@ -72,6 +80,9 @@ export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentSty
       newSpecialStyles.sub = true;
     } else if (tagName === 'sup') {
       newSpecialStyles.sup = true;
+    }
+    if (style.border) {
+      newSpecialStyles.border = style.border;
     }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
