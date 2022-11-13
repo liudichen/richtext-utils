@@ -1,6 +1,6 @@
 {
   "name": "@iimm/richtext-utils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "使用ckeditor5富文本及其与word转化时使用的一些简单工具",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -14,6 +14,8 @@
     "iimm",
     "ckeditor5",
     "office",
+    "word",
+    "convert",
     "html",
     "json",
     "utils"
@@ -23,8 +25,7 @@
   ],
   "license": "MIT",
   "files": [
-    "dist",
-    "compiled"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
