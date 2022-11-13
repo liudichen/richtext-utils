@@ -25,7 +25,9 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   if (styles?.pStyle) data.pStyle = styles.pStyle;
   // === w:pPr -> w:spacing ======
   if (keys.includes('line-height')) {
-    data.line = htmlSpacingSizeToWordSizeNumber(styles['line-height']);
+    let lineHeight = styles['line-height'];
+    if (+lineHeight) lineHeight = `${Math.round(+lineHeight * 100)}%`;
+    data.line = htmlSpacingSizeToWordSizeNumber(lineHeight);
     if (styles['line-height-rule'] === 'exactly') data.lineRuleExact = true;
   }
   if (keys.includes('mso-para-margin-top')) {
