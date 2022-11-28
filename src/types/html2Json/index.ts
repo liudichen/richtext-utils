@@ -113,7 +113,7 @@ export interface INodeStructAndConvertConfig {
   maxImgCx?: number,
   /** 图片的最大cy */
   maxImgCy?: number,
-  /** 图片的最大宽度 */
+  /** 表格的最大宽度 */
   tableMaxWidth?: number
 }
 
