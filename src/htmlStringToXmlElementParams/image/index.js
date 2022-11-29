@@ -23,6 +23,8 @@ export const imageHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
   const { STYLE, ATTRIBUTES } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [ATTRIBUTES]: attrs = {}, [STYLE]: style } = node;
   const imgStepOneNode = getImageElementStepOneParamsFromHtmlAttributes({ type: 'image', ...attrs, style });
+  if (!getImageStepTwoParamsFn) throw new Error('必须传递getImageStepTwoParamsFn函数');
   const imgStepTwoPrams = await getImageStepTwoParamsFn?.(imgStepOneNode);
-  if (imgStepTwoPrams) { return { ...imgStepTwoPrams, type: 'image' }; }
+  if (!imgStepTwoPrams || !imgStepTwoPrams.rId) throw new Error('getImageStepTwoParamsFn函数处理后无输出或缺少rId参数');
+  return { ...imgStepTwoPrams, type: 'image' };
 };
