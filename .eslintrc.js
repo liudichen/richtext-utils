@@ -27,16 +27,6 @@ module.exports = {
         '@typescript-eslint/eslint-plugin',
         'eslint-plugin-tsdoc',
       ],
-      parserOptions: {
-        project: './tsconfig.json',
-        tsconfigRootDir: __dirname,
-        ecmaVersion: 2018,
-        sourceType: 'module',
-      },
-      rules: {
-        'tsdoc/syntax': 'warn',
-        'jsdoc/check-tag-names': 'off',
-      },
     },
   ],
   rules: {
