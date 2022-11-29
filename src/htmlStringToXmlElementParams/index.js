@@ -48,11 +48,9 @@ export const htmlJsonNodeParser = async (node, config, getImageStepTwoParamsFn) 
 
 export const htmlStringToXmlElementGenerateParams = async (htmlStr, config, getImageStepTwoParamsFn) => {
   const jsonArr = htmlToJson(htmlStr, { skipComment: true, skipScript: true, skipStyle: true, keepInlineStyle: true, keepClass: false, keepRawInlineStyle: false, styleCamelCase: false }, config);
-  console.log('jsonArr', jsonArr);
   const data = [];
   for (let i = 0; i < jsonArr.length; i++) {
     let node = await htmlJsonNodeParser(jsonArr[i], config, getImageStepTwoParamsFn);
-    // console.log('node', i, node);
     if (!node) continue;
     if (Array.isArray(node)) { // 有一定的可能性是2层数组（figure导致的）
       node = node.filter(Boolean);
