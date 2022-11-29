@@ -31,11 +31,11 @@ export const htmlFontSizeToWordFontSizeNumber = (fontSize) => {
     type = 'px'; number = fontSize;
   } else if (typeof fontSize === 'string' && /^[\d.]+(pt|px)$/.test(fontSize)) {
     number = +fontSize.slice(0, fontSize.length - 2);
-    if (!isNaN) {
+    if (!isNaN(number)) {
       type = fontSize.slice(-2);
     }
   }
-  if (type === 'px') number = number * 3 / 4;
-  if (type) number = number * 2;
+  if (type === 'px') { number = number * 3 / 4; type = 'pt'; }
+  if (type === 'pt') number = number * 2;
   return Math.round(number || 0);
 };
