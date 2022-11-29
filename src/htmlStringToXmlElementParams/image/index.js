@@ -24,5 +24,5 @@ export const imageHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
   const { [ATTRIBUTES]: attrs = {}, [STYLE]: style } = node;
   const imgStepOneNode = getImageElementStepOneParamsFromHtmlAttributes({ type: 'image', ...attrs, style });
   const imgStepTwoPrams = await getImageStepTwoParamsFn?.(imgStepOneNode);
-  if (getImageStepTwoParamsFn) { return imgStepTwoPrams; }
+  if (imgStepTwoPrams) { return { ...imgStepTwoPrams, type: 'image' }; }
 };
