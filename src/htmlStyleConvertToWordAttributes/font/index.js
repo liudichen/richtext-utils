@@ -1,10 +1,3 @@
-/*
- * @Description:
- * @Author: 柳涤尘 https://www.iimm.ink
- * @LastEditors: 柳涤尘 liudichen@foxmail.com
- * @Date: 2022-10-28 09:35:05
- * @LastEditTime: 2022-11-08 22:47:34
- */
 import { isAllChineseWord } from '../../judgeAndCompare';
 
 export const getFontFamilyFromHtmlStyleObj = (styles, onlyHans = true) => {
@@ -31,12 +24,12 @@ export const getFontFamilyFromHtmlStyleObj = (styles, onlyHans = true) => {
 };
 
 export const htmlFontSizeToWordFontSizeNumber = (fontSize) => {
+  if (!fontSize) return;
   let type = '';
   let number = 0;
   if (typeof fontSize === 'number') {
     type = 'px'; number = fontSize;
   } else if (typeof fontSize === 'string' && /^[\d.]+(pt|px)$/.test(fontSize)) {
-    type = fontSize.slice(-2);
     number = +fontSize.slice(0, fontSize.length - 2);
     if (!isNaN) {
       type = fontSize.slice(-2);

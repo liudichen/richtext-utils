@@ -151,7 +151,10 @@ export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoP
     }
     if (tagName === 'span') {
       const result = [];
-      await spanHtmlJsonNodeParser(child, {}, {}, result, config, getImageStepTwoParamsFn);
+      const parentStyle = {};
+      if (style['font-family']) parentStyle['font-family'] = style['font-family'];
+      if (style['font-size']) parentStyle['font-size'] = style['font-size'];
+      await spanHtmlJsonNodeParser(child, {}, parentStyle, result, config, getImageStepTwoParamsFn);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素
