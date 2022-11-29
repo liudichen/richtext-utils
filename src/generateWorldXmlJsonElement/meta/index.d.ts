@@ -11,6 +11,7 @@ interface IGetCoreXmlJsParams {
   /** 更新信息? */
   update?: boolean,
   creator?: string,
+  updator?: string,
   title?: string,
   subject?: string,
   revision?: number | string

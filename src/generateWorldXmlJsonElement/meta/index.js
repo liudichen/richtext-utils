@@ -9,6 +9,7 @@ export const getCoreXmlJs = (params) => {
   const {
     update,
     creator,
+    updator,
     title,
     subject,
     revision,
@@ -79,22 +80,22 @@ export const getCoreXmlJs = (params) => {
       });
     }
   }
-  if (creator) {
-    const index = coreJs.elements[0].elements.findIndex((ele) => ele.name === 'cp:lastModifiedBy');
-    if (index !== -1) {
-      coreJs.elements[0].elements[index].elements = [{ type: 'text', text: `${creator}` }];
-    } else {
-      coreJs.elements[0].elements.push({ type: 'element', name: 'cp:lastModifiedBy', elements: [{ type: 'text', text: `${creator}` }],
-      });
-    }
+  if (creator || updator) {
     if (!update) {
       const index = coreJs.elements[0].elements.findIndex((ele) => ele.name === 'dc:creator');
       if (index !== -1) {
-        coreJs.elements[0].elements[index].elements = [{ type: 'text', text: `${creator}` }];
+        coreJs.elements[0].elements[index].elements = [{ type: 'text', text: `${creator ?? '柳涤尘'}` }];
       } else {
         coreJs.elements[0].elements.push({ type: 'element', name: 'dc:creator', elements: [{ type: 'text', text: `${creator}` }],
         });
       }
+    }
+    const index = coreJs.elements[0].elements.findIndex((ele) => ele.name === 'cp:lastModifiedBy');
+    if (index !== -1) {
+      coreJs.elements[0].elements[index].elements = [{ type: 'text', text: `${updator ?? creator}` }];
+    } else {
+      coreJs.elements[0].elements.push({ type: 'element', name: 'cp:lastModifiedBy', elements: [{ type: 'text', text: `${updator ?? creator}` }],
+      });
     }
   }
   if (revision) {
