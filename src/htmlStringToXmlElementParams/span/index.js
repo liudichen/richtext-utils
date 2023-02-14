@@ -8,6 +8,7 @@
 import { DefaultNodeStructOptions } from '../../JsonAndHtml';
 import { getFontFamilyFromHtmlStyleObj, htmlColorToWordColor, htmlFontSizeToWordFontSizeNumber } from '../../htmlStyleConvertToWordAttributes';
 import { imageHtmlJsonNodeParser } from '../image';
+import { getParagraphElementParamsFormStyles } from '../paragraph';
 
 export const getTextElementParamsFromStyles = (styles) => {
   const data = {};
@@ -60,7 +61,7 @@ export const getTextElementParamsFromStyles = (styles) => {
   return data;
 };
 
-export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentStyles = {}, result = [], config, getImageStepTwoParamsFn) => {
+export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentStyles = {}, result = [], config, getImageStepTwoParamsFn, paragraghParams) => {
   const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
   const { [NODENAME]: tagName, type, [STYLE]: style = {}, [TEXTVALUE]: text, [CHILDREN]: children } = node;
   if (type === TEXTTAG) {
@@ -89,6 +90,18 @@ export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentSty
       await spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles, ...style }, result, config, getImageStepTwoParamsFn);
     }
   } else if (tagName === 'span') {
+    if (paragraghParams) {
+      const pStyle = getParagraphElementParamsFormStyles(style);
+      const keys = Object.keys(pStyle);
+      if (keys.length > 1) {
+        for (let k = 0; k < keys.length; k++) {
+          const attr = keys[k];
+          if (attr !== 'p' && !paragraghParams[attr]) {
+            paragraghParams[attr] = pStyle[attr];
+          }
+        }
+      }
+    }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
       await spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...parentStyles, ...style }, result, config, getImageStepTwoParamsFn);

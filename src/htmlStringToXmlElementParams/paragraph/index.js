@@ -131,13 +131,14 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   }
 
   // ========== w:pPr -> w:rPr -> w:rFonts 暂时仅保留汉语字体
-  data.fontFamily = getFontFamilyFromHtmlStyleObj(styles);
+  const font = getFontFamilyFromHtmlStyleObj(styles);
+  if (font) data.fontFamily = font;
   return data;
 };
 
 export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoParamsFn) => {
   const { NODENAME, TEXTTAG, TEXTVALUE, CHILDREN, STYLE } = Object.assign({ ...DefaultNodeStructOptions }, config);
-  const { [CHILDREN]: children, [STYLE]: style = {} } = node;
+  const { [CHILDREN]: children, [STYLE]: style = {}, [NODENAME]: pTagName } = node;
   const data = [];
   let imgFirst = true;
   const paragraphParams = getParagraphElementParamsFormStyles(style);
@@ -154,7 +155,7 @@ export const paragraphHtmlJsonNodeParser = async (node, config, getImageStepTwoP
       const parentStyle = {};
       if (style['font-family']) parentStyle['font-family'] = style['font-family'];
       if (style['font-size']) parentStyle['font-size'] = style['font-size'];
-      await spanHtmlJsonNodeParser(child, {}, parentStyle, result, config, getImageStepTwoParamsFn);
+      await spanHtmlJsonNodeParser(child, {}, parentStyle, result, config, getImageStepTwoParamsFn, pTagName === 'li' ? paragraphParams : undefined);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素
