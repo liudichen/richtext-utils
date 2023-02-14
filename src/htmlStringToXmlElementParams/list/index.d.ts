@@ -12,3 +12,5 @@ import { IGetImageStepTwoParamsFn, IGetParagraphXmlElementParams, IJsonNodeItem,
  * 每1级按悬挂缩进2个字符，段落左侧缩进(lvl-1)*2个字符处理。
  */
 export declare const listHtmlJsonNodeParser: (node: IJsonNodeItem, config?: INodeStructAndConvertConfig, getImageStepTwoParamsFn?: IGetImageStepTwoParamsFn) => Promise<IGetParagraphXmlElementParams[]>;
+
+export declare const getListNumId: () => number;

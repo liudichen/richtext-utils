@@ -114,7 +114,9 @@ export interface INodeStructAndConvertConfig {
   /** 图片的最大cy */
   maxImgCy?: number,
   /** 表格的最大宽度 */
-  tableMaxWidth?: number
+  tableMaxWidth?: number,
+  /** 根据自动列表等级生产额外的style base0 */
+  listExtraStyleGenerateFn?: (lvl: number, index?: number) => object,
 }
 
 

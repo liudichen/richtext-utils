@@ -47,6 +47,8 @@ export const getParagraphXmlElementObj = (params, config) => {
     fontSize: fontSizeProp,
     items,
     pStyle, // 预定义样式名，如标题等级
+    listLvl,
+    listNumId,
   } = params || {};
   const { defaultFontSize, defaultFontFamily } = config || {};
   const fontFamily = fontFamilyProp ?? defaultFontFamily;
@@ -151,14 +153,36 @@ export const getParagraphXmlElementObj = (params, config) => {
       w_rPr.elements.push(w_szCs);
     }
   }
+  let w_numPr = null;
+  if (typeof listLvl === 'number' && listNumId) {
+    w_numPr = {
+      type: 'element',
+      name: 'w:numPr',
+      elements: [
+        {
+          type: 'element',
+          name: 'w:ilvl',
+          attributes: { 'w:val': `${listLvl}` },
+          elements: [],
+        },
+        {
+          type: 'element',
+          name: 'w:numId',
+          attributes: { 'w:val': `${listNumId}` },
+          elements: [],
+        },
+      ],
+    };
+  }
   let w_pPr = null;
-  if (w_pStyle || w_spacing || w_ind || w_jc || w_rPr) {
+  if (w_pStyle || w_spacing || w_ind || w_jc || w_rPr || w_numPr) {
     w_pPr = {
       type: 'element',
       name: 'w:pPr',
       elements: [],
     };
     if (w_pStyle) w_pPr.elements.push(w_pStyle);
+    if (w_numPr) w_pPr.elements.push(w_numPr);
     if (w_spacing) w_pPr.elements.push(w_spacing);
     if (w_ind) w_pPr.elements.push(w_ind);
     if (w_jc) w_pPr.elements.push(w_jc);

@@ -23,6 +23,8 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   const keys = Object.keys(styles || {});
   if (!keys.length) return data;
   if (styles?.pStyle) data.pStyle = styles.pStyle;
+  if (keys.includes('listLvl')) data.listLvl = styles.listLvl;
+  if (keys.includes('listNumId')) data.listNumId = styles.listNumId;
   // === w:pPr -> w:spacing ======
   if (keys.includes('line-height')) {
     let lineHeight = styles['line-height'];

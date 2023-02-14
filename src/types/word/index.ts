@@ -119,6 +119,10 @@ export interface IGetParagraphXmlElementParams {
   items?: (IGetTextXmlElementParams | IGetImageXmlElementParams | IGetTableXmlElementParams)[],
   /** 段落预定义样式，如标题等级 */
   pStyle?: string, // 预定义样式名，如标题等级
+
+  /** 有序 */
+  listNumId?: number,
+  listLvl?: number,
 }
 
 export * from './table';
