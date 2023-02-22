@@ -59,7 +59,7 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   if (keys.includes('mso-para-margin-left')) {
     const value = styles['mso-para-margin-left'];
     const wordValue = htmlSpacingSizeToWordSizeNumber(value, fontSize);
-    if (value?.endsWith('gd') || value.endsWith('em')) {
+    if (value?.endsWith('gd') || value?.endsWith('em')) {
       data.leftChars = Math.round(+(value.slice(0, value.length - 2)) * 100);
       if (!keys.includes('margin-left') && !l) {
         data.left = Math.round(wordValue / 100 * 210);
@@ -76,7 +76,7 @@ export const getParagraphElementParamsFormStyles = (styles) => {
   if (keys.includes('mso-para-margin-right')) {
     const value = styles['mso-para-margin-right'];
     const wordValue = htmlSpacingSizeToWordSizeNumber(value, fontSize);
-    if (value?.endsWith('gd') || value.endsWith('em')) {
+    if (value?.endsWith('gd') || value?.endsWith('em')) {
       data.rightChars = Math.round(+(value.slice(0, value.length - 2)) * 100);
       if (!keys.includes('margin-right') && !r) {
         data.right = Math.round(wordValue / 100 * 210);
@@ -94,7 +94,7 @@ export const getParagraphElementParamsFormStyles = (styles) => {
     const value = styles['text-indent'];
     const wordValue = htmlSpacingSizeToWordSizeNumber(value, fontSize);
     if (wordValue) {
-      if (value.endsWith('gd') || value.endsWith('em')) {
+      if (value?.endsWith('gd') || value?.endsWith('em')) {
         if (wordValue > 0) {
           data.firstLineChars = Math.round(+(value.slice(0, value.length - 2)) * 100);
           data.firstLine = Math.round(wordValue / 100 * 210);

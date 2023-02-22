@@ -22,7 +22,7 @@ const parseStyleBorder = (value, inside) => {
   } else {
     color = htmlColorToWordColor(color);
   }
-  if (sz.endsWith('pt')) {
+  if (sz?.endsWith('pt')) {
     sz = +sz.slice(0, sz.length - 2) * 8;
   } else {
     sz = 2;
