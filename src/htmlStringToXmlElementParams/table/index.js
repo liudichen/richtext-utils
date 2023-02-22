@@ -22,7 +22,7 @@ const parseStyleBorder = (value, inside) => {
   } else {
     color = htmlColorToWordColor(color);
   }
-  if (sz?.endsWith('pt')) {
+  if (typeof sz === 'string' && sz.endsWith('pt')) {
     sz = +sz.slice(0, sz.length - 2) * 8;
   } else {
     sz = 2;
@@ -72,7 +72,7 @@ const getCellBorderFromStyles = (styles) => {
         sz = color; color = commonColor;
       }
       val = val === 'solid' ? 'single' : camelCase(val);
-      if (sz?.endsWith('pt')) {
+      if (typeof sz === 'string' && sz.endsWith('pt')) {
         sz = +sz.slice(0, sz.length - 2) * 8;
         // 平衡线条粗细，防止过粗
         if (val !== 'single' && sz > 4)sz = 4;

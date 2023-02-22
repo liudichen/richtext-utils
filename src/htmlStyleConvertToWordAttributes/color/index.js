@@ -52,7 +52,7 @@ const getHSL = (hsl) =>
     .split(',')
     .map((ele) => {
       if (!ele) return 0;
-      return ele.endsWith('%') ? (+ele.slice(0, ele.length - 1) / 100 || 0) : (+ele || 0);
+      return (typeof ele === 'string' && ele.endsWith('%')) ? (+ele.slice(0, ele.length - 1) / 100 || 0) : (+ele || 0);
     });
 const HSL2RGB = (HSL) => {
   const [ h, s, l ] = HSL;

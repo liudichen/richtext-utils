@@ -18,7 +18,7 @@ export const getTextElementParamsFromStyles = (styles) => {
   // w:kern
   if (keys.includes('mso-font-kerning')) {
     let kern = styles['mso-font-kerning'];
-    if (kern && kern?.endsWith('pt')) {
+    if (typeof kern === 'string' && kern.endsWith('pt')) {
       kern = +(kern.slice(0, kern.length - 2).trim());
       if (kern) data.kern = kern * 2;
     }
