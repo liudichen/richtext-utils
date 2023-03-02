@@ -94,6 +94,7 @@ const getCellBorderFromStyles = (styles, commonInfo = {}) => {
     if (alt) {
       const border = parseStyleBorder(alt);
       if (!border.color) border.color = commonColor || commmonStyle?.color || commonInfo?.[direction]?.color;
+      borders[direction] = border;
     }
   }
   if (Object.keys(borders).length) return borders;
