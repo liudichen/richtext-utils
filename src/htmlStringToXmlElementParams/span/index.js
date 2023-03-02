@@ -9,6 +9,7 @@ import { DefaultNodeStructOptions, camelCase } from '../../JsonAndHtml';
 import { getFontFamilyFromHtmlStyleObj, htmlColorToWordColor, htmlFontSizeToWordFontSizeNumber } from '../../htmlStyleConvertToWordAttributes';
 import { imageHtmlJsonNodeParser } from '../image';
 import { getParagraphElementParamsFormStyles } from '../paragraph';
+import { WordUnderlineStyle } from '../constant';
 
 export const getTextElementParamsFromStyles = (styles) => {
   const data = {};
@@ -84,7 +85,7 @@ export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentSty
           underline = arr[arr.length - 1];
           underlineColor = htmlColorToWordColor(arr[0]);
         } else {
-          if ([ 'single', 'double', 'thick', 'dotted', 'dash', 'dot-dash', 'dot-dot-dash', 'wave', 'wavy-heavy', 'wavy-double' ].includes(underlineString)) {
+          if (WordUnderlineStyle.includes(underlineString)) {
             underline = camelCase(underlineString);
           } else {
             underlineColor = htmlColorToWordColor(underlineString);

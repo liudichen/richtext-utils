@@ -13,11 +13,38 @@ import { htmlColorToWordColor } from '../../htmlStyleConvertToWordAttributes';
 
 
 const parseStyleBorder = (value, inside) => {
-  let [ val, color, sz ] = value.split(/[\s]+/);
-  if (inside) {
-    [ sz, val, color ] = value.split(/[\s]+/);
+  const arr = value.split(/[\s]+/);
+  let [ val, color, sz ] = arr;
+  const border = { color: 'auto' };
+  for (let i = 0; i < arr.length; i++) {
+    let v = arr[i];
+    if (typeof v === 'number' || /[\.0-9]/.test(v)) {
+      if (typeof v === 'string' && v.endsWith('pt')) {
+        border.sz = +(v.slice(0, sz.length - 2)) * 8;
+      } else {
+        border.sz = 2;
+      }
+    } else if ([ 'solid' ].includes(v)) {
+      if (v === 'solid') {
+        v = 'single';
+      } else {
+        v = camelCase(v);
+      }
+      border.val = v;
+    } else {
+      if (v === 'windowtext') {
+        border.color = 'auto';
+      } else {
+        border.color = htmlColorToWordColor(color) || 'auto';
+      }
+    }
   }
-  if (color === 'windowtext') {
+  if (inside) {
+    [ sz, val, color ] = arr;
+  } else if (arr?.length === 2) {
+    sz = color; color = 'windowtext';
+  }
+  if (color === 'windowtext' || !color) {
     color = 'auto';
   } else {
     color = htmlColorToWordColor(color);
@@ -44,6 +71,22 @@ const getTableBordersFromStyles = (styles) => {
     const altBorder = parseStyleBorder(styles['mso-border-alt']);
     borders.top = borders.left = borders.bottom = borders.right = borders.insideH = borders.insideV = altBorder;
   }
+  if (styles['mso-border-top-alt']) {
+    const top = parseStyleBorder(styles['mso-border-top-alt'], true);
+    if (top)borders.top = top;
+  }
+  if (styles['mso-border-bottom-alt']) {
+    const bottom = parseStyleBorder(styles['mso-border-bottom-alt'], true);
+    if (bottom)borders.bottom = bottom;
+  }
+  if (styles['mso-border-right-alt']) {
+    const right = parseStyleBorder(styles['mso-border-right-alt'], true);
+    if (right) borders.right = right;
+  }
+  if (styles['mso-border-top-alt']) {
+    const left = parseStyleBorder(styles['mso-border-top-alt'], true);
+    if (left) borders.left = left;
+  }
   if (styles['mso-border-insideh']) {
     borders.insideH = parseStyleBorder(styles['mso-border-insideh'], true);
   }
@@ -66,26 +109,8 @@ const getCellBorderFromStyles = (styles) => {
     const direction = directions[i];
     const value = styles[`mso-border-${direction}-alt`];
     if (value) {
-      const attrs = value.split(/[\s]+/);
-      let [ val, color, sz ] = attrs;
-      if (attrs.length === 2 && commonColor) {
-        sz = color; color = commonColor;
-      }
-      val = val === 'solid' ? 'single' : camelCase(val);
-      if (typeof sz === 'string' && sz.endsWith('pt')) {
-        sz = +sz.slice(0, sz.length - 2) * 8;
-        // 平衡线条粗细，防止过粗
-        if (val !== 'single' && sz > 4)sz = 4;
-      } else {
-        sz = 2;
-      }
-      if (color === 'windowtext') {
-        color === 'auto';
-      } else {
-        color = htmlColorToWordColor(color);
-        if (!color) color = 'auto';
-      }
-      borders[direction] = { sz, color, val };
+      const border = getCellBorderFromStyles(value);
+      borders[direction] = border;
     }
   }
   if (Object.keys(borders).length) return borders;
