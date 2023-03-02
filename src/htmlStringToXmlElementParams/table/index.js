@@ -20,7 +20,7 @@ const parseStyleBorder = (value, commonInfo = {}) => {
     let v = arr[i];
     if (typeof v === 'number' || /[\.0-9]/.test(v)) {
       if (typeof v === 'string' && v.endsWith('pt')) {
-        border.sz = +(v.slice(0, v.length - 2)) * 8;
+        border.sz = +(v.slice(0, v.length - 2)) * 4;
       } else {
         border.sz = typeof v === 'number' ? v : 2;
       }
