@@ -10,21 +10,21 @@ import { htmlJsonNodeParser } from '..';
 import { paragraphHtmlJsonNodeParser } from '../paragraph';
 import { htmlSpacingSizeToWordSizeNumber } from '../../htmlStyleConvertToWordAttributes';
 import { htmlColorToWordColor } from '../../htmlStyleConvertToWordAttributes';
+import { WordTableBorderStyle } from '../constant';
 
 
-const parseStyleBorder = (value, inside) => {
+const parseStyleBorder = (value, commonInfo = {}) => {
   const arr = value.split(/[\s]+/);
-  let [ val, color, sz ] = arr;
-  const border = { color: 'auto' };
+  const border = { };
   for (let i = 0; i < arr.length; i++) {
     let v = arr[i];
     if (typeof v === 'number' || /[\.0-9]/.test(v)) {
       if (typeof v === 'string' && v.endsWith('pt')) {
-        border.sz = +(v.slice(0, sz.length - 2)) * 8;
+        border.sz = +(v.slice(0, v.length - 2)) * 8;
       } else {
-        border.sz = 2;
+        border.sz = typeof v === 'number' ? v : 2;
       }
-    } else if ([ 'solid' ].includes(v)) {
+    } else if (WordTableBorderStyle.includes(v)) {
       if (v === 'solid') {
         v = 'single';
       } else {
@@ -35,68 +35,51 @@ const parseStyleBorder = (value, inside) => {
       if (v === 'windowtext') {
         border.color = 'auto';
       } else {
-        border.color = htmlColorToWordColor(color) || 'auto';
+        border.color = htmlColorToWordColor(v);
       }
     }
   }
-  if (inside) {
-    [ sz, val, color ] = arr;
-  } else if (arr?.length === 2) {
-    sz = color; color = 'windowtext';
-  }
-  if (color === 'windowtext' || !color) {
-    color = 'auto';
-  } else {
-    color = htmlColorToWordColor(color);
-  }
-  if (typeof sz === 'string' && sz.endsWith('pt')) {
-    sz = +sz.slice(0, sz.length - 2) * 8;
-  } else {
-    sz = 2;
-  }
-  if (val === 'solid') {
-    val = 'single';
-  } else {
-    val = camelCase(val);
-  }
-  return {
-    sz, val, color,
-  };
+  if (!border.color) border.color = commonInfo?.color;
+  if (border.color === 'none') border.color = undefined;
+  if (!border.sz) border.sz = commonInfo?.size;
+  if (!border.val) border.val = commonInfo.val;
+  return border;
 };
 
 
 const getTableBordersFromStyles = (styles) => {
+  /** 这个算默认值 */
   const borders = {};
   if (styles['mso-border-alt']) {
     const altBorder = parseStyleBorder(styles['mso-border-alt']);
     borders.top = borders.left = borders.bottom = borders.right = borders.insideH = borders.insideV = altBorder;
   }
   if (styles['mso-border-top-alt']) {
-    const top = parseStyleBorder(styles['mso-border-top-alt'], true);
-    if (top)borders.top = top;
+    const top = parseStyleBorder(styles['mso-border-top-alt']);
+    if (top) borders.top = top;
   }
   if (styles['mso-border-bottom-alt']) {
-    const bottom = parseStyleBorder(styles['mso-border-bottom-alt'], true);
-    if (bottom)borders.bottom = bottom;
+    const bottom = parseStyleBorder(styles['mso-border-bottom-alt']);
+    if (bottom) borders.bottom = bottom;
   }
   if (styles['mso-border-right-alt']) {
-    const right = parseStyleBorder(styles['mso-border-right-alt'], true);
+    const right = parseStyleBorder(styles['mso-border-right-alt']);
     if (right) borders.right = right;
   }
   if (styles['mso-border-top-alt']) {
-    const left = parseStyleBorder(styles['mso-border-top-alt'], true);
+    const left = parseStyleBorder(styles['mso-border-top-alt']);
     if (left) borders.left = left;
   }
   if (styles['mso-border-insideh']) {
-    borders.insideH = parseStyleBorder(styles['mso-border-insideh'], true);
+    borders.insideH = parseStyleBorder(styles['mso-border-insideh']);
   }
   if (styles['mso-border-insidev']) {
-    borders.insideV = parseStyleBorder(styles['mso-border-insidev'], true);
+    borders.insideV = parseStyleBorder(styles['mso-border-insidev']);
   }
   if (Object.keys(borders).length) { return borders; }
 };
 
-const getCellBorderFromStyles = (styles) => {
+const getCellBorderFromStyles = (styles, commonInfo = {}) => {
   const borders = {};
   let commonColor = styles['mso-border-color-alt'];
   if (commonColor) {
@@ -107,10 +90,10 @@ const getCellBorderFromStyles = (styles) => {
   const directions = [ 'top', 'bottom', 'right', 'left' ];
   for (let i = 0; i < directions.length; i++) {
     const direction = directions[i];
-    const value = styles[`mso-border-${direction}-alt`];
-    if (value) {
-      const border = getCellBorderFromStyles(value);
-      borders[direction] = border;
+    const alt = styles[`mso-border-${direction}-alt`];
+    if (alt) {
+      const border = parseStyleBorder(alt);
+      if (!border.color) border.color = commonColor || commmonStyle?.color || commonInfo?.[direction]?.color;
     }
   }
   if (Object.keys(borders).length) return borders;
@@ -195,7 +178,7 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
         commonData.width = width;
       }
       colspan = +colspan; rowspan = +rowspan;
-      const cellBorders = getCellBorderFromStyles(style);
+      const cellBorders = getCellBorderFromStyles(style, borders);
       if (cellBorders) cellData.borders = cellBorders;
       if (i === 0) {
         if (colspan > 1 || !width) {
