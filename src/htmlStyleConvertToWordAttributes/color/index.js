@@ -143,9 +143,9 @@ export const hexColor2HslColor = (hex, options) => {
 
 export const htmlColorToWordColor = (hColor) => {
   let color = hColor;
-  if (isHexColor) {
+  if (isHexColor(hColor)) {
     color = color.replace(/^#/, '').toUpperCase();
-  } else if (isWordColor) {
+  } else if (isWordColor(hColor)) {
     // 从word粘贴到ckeditor的颜色和word中自定义的颜色不一致
     switch (hColor) {
       case 'red':
@@ -192,9 +192,9 @@ export const htmlColorToWordColor = (hColor) => {
       default:
         break;
     }
-  } else if (isRgbColor) {
+  } else if (isRgbColor(hColor)) {
     color = rgbColor2HexColor(color, { noSharp: true, upperCase: true });
-  } else if (isHslColor) {
+  } else if (isHslColor(hColor)) {
     color = hslColor2HexColor(color, { noSharp: true, upperCase: true });
   }
   return color;

@@ -5,10 +5,8 @@
  * @Date: 2022-10-25 16:09:53
  * @LastEditTime: 2022-11-08 13:02:19
  */
-import { camelCase } from '../../JsonAndHtml';
-
 export const getTextXmlElementObj = (params, config) => {
-  let {
+  const {
     fontFamily: fontFamilyProp, // 字体
     text, // 文本
     fontSize: fontSizeProp, // 小四
@@ -16,6 +14,7 @@ export const getTextXmlElementObj = (params, config) => {
     color, // 文字颜色
     italic, // 倾斜
     underline, // 下划线样式
+    underlineColor,
     strike, // 删除线
     backgroundColor, // 文字高亮背景色
     sub, // 下标
@@ -28,7 +27,6 @@ export const getTextXmlElementObj = (params, config) => {
   const { defaultFontSize, defaultFontFamily } = config || {};
   const fontFamily = fontFamilyProp ?? defaultFontFamily;
   const fontSize = fontSizeProp ?? defaultFontSize;
-  if (underline) underline = camelCase(underline);
   const w_r = {
     type: 'element',
     name: 'w:r',
@@ -79,7 +77,11 @@ export const getTextXmlElementObj = (params, config) => {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:highlight', attributes: { 'w:val': `${backgroundColor}` }, elements: [] });
   }
   if (underline) {
-    w_r.elements[0].elements.push({ type: 'element', name: 'w:u', attributes: { 'w:val': 'underline' }, elements: [] });
+    const attr = { 'w:val': underline };
+    if (underlineColor) {
+      attr['w:color'] = underlineColor;
+    }
+    w_r.elements[0].elements.push({ type: 'element', name: 'w:u', attributes: attr, elements: [] });
   }
   if (border) {
     w_r.elements[0].elements.push({

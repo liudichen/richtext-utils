@@ -5,7 +5,7 @@
  * @Date: 2022-10-28 09:43:15
  * @LastEditTime: 2022-11-08 22:48:04
  */
-import { DefaultNodeStructOptions } from '../../JsonAndHtml';
+import { DefaultNodeStructOptions, camelCase } from '../../JsonAndHtml';
 import { getFontFamilyFromHtmlStyleObj, htmlColorToWordColor, htmlFontSizeToWordFontSizeNumber } from '../../htmlStyleConvertToWordAttributes';
 import { imageHtmlJsonNodeParser } from '../image';
 import { getParagraphElementParamsFormStyles } from '../paragraph';
@@ -41,8 +41,9 @@ export const getTextElementParamsFromStyles = (styles) => {
   if (styles['background-color']) {
     data.backgroundColor = htmlColorToWordColor(styles['background-color']);
   }
-  if (styles.underline === true) {
-    data.underline = true;
+  if (styles.underline) {
+    data.underline = styles.underline;
+    data.underlineColor = styles.underlineColor;
   }
   if (styles.sub === true) {
     data.sub = true;
@@ -74,7 +75,24 @@ export const spanHtmlJsonNodeParser = async (node, specailStyles = {}, parentSty
     } else if (tagName === 'em' || tagName === 'i') {
       newSpecialStyles.italic = true;
     } else if (tagName === 'u') {
-      newSpecialStyles.underline = true;
+      const underlineString = style?.['text-underline'] ?? style?.textUnderline;
+      let underline = 'single';
+      let underlineColor = null;
+      if (underlineString) {
+        if (underlineString.includes(' ')) {
+          const arr = underline.split('');
+          underline = arr[arr.length - 1];
+          underlineColor = htmlColorToWordColor(arr[0]);
+        } else {
+          if ([ 'single', 'double', 'thick', 'dotted', 'dash', 'dot-dash', 'dot-dot-dash', 'wave', 'wavy-heavy', 'wavy-double' ].includes(underlineString)) {
+            underline = camelCase(underlineString);
+          } else {
+            underlineColor = htmlColorToWordColor(underlineString);
+          }
+        }
+      }
+      newSpecialStyles.underline = underline;
+      newSpecialStyles.underlineColor = underlineColor;
     } else if (tagName === 's') {
       newSpecialStyles.strike = true;
     } else if (tagName === 'sub') {

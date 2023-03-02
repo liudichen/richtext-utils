@@ -34,6 +34,7 @@ export interface IGetTextXmlElementParams {
   italic?: boolean,
   /** 下划线类型 */
   underline?: string,
+  underlineColor?: string,
   /** 是否有文字删除线 */
   strike?: boolean,
   /** 文字高亮的背景颜色 */
