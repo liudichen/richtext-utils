@@ -65,7 +65,7 @@ export interface IImageStepTwoResult {
   name?: string
 }
 
-export type IGetImageStepTwoParamsFn = (stepOneParmas: IImageStepOneResult) => Promise<IImageStepTwoResult>;
+export type IGetImageStepTwoParamsFn = ((stepOneParmas: IImageStepOneResult) => Promise<IImageStepTwoResult>) | ((stepOneParmas: IImageStepOneResult) => IImageStepTwoResult);
 
 /** 最终传入生成xml图片节点的信息，注意：前端及step2之前均无法进入该状态 */
 export interface IGetImageXmlElementParams {
