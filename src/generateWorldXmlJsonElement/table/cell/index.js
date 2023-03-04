@@ -26,9 +26,11 @@ const getCellBordersXmlObj = (borders) => {
       type: 'element', name: `w:${k}`, attributes: {},
     };
     if (val) borderInfo.attributes['w:val'] = val;
-    if (typeof sz !== 'undefined') borderInfo.attributes['w:sz'] = `${sz}`;
-    borderInfo.attributes['w:space'] = `${space || 0}`;
-    if (color) borderInfo.attributes['w:color'] = `${color}`;
+    if (val !== 'nil') {
+      if (typeof sz !== 'undefined') borderInfo.attributes['w:sz'] = `${sz}`;
+      borderInfo.attributes['w:space'] = `${space || 0}`;
+      if (color) borderInfo.attributes['w:color'] = `${color}`;
+    }
     w_tcBorders.elements.push(borderInfo);
   }
   return w_tcBorders;

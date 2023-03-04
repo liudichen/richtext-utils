@@ -193,7 +193,7 @@ export const tableHtmlJsonNodeParser = async (node, config, getImageStepTwoParam
       }
       if (colspan > 1) commonData.colspan = colspan;
       // 单元格的垂直对齐方式， word里默认是top，html里默认是center,对应th，tc属性的vertical-align:bottom/top，center时style里没有。水平对齐由下面的段落控制。
-      if (vAlign !== 'top') { commonData.vAlign === vAlign || 'center'; }
+      if (vAlign !== 'top') { commonData.vAlign = vAlign || 'center'; }
 
       if (rowspan > 1) {
         cellData.vMergeRestart = true;
