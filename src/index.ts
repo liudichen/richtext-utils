@@ -1,9 +1,7 @@
-export * from './types';
-export * from './JsonAndHtml';
-export * from './judgeAndCompare';
-export * from './generateWorldXmlJsonElement';
-export * from './htmlStringToXmlElementParams';
-export * from './htmlStyleConvertToWordAttributes';
-export * from './ckeditorConfig';
+export * from './htmlToWordXmlJsElements';
 
-export * from './extended';
+export * from './utils';
+
+export * from './types';
+
+export * from './xml-js';

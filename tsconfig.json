@@ -1,8 +1,19 @@
 {
   "compilerOptions": {
-    "strict": true,
     "declaration": true,
     "skipLibCheck": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "lib": [
+      "DOM",
+      "ES2016"
+    ],
+    "paths": {
+      "@/types/*": [
+        "src/types/*"
+      ],
+      "@/utils/*": [
+        "src/utils/*"
+      ]
+    }
   }
 }

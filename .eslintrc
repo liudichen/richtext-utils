@@ -1,0 +1,27 @@
+{
+  "extends": "eslint-config-egg/typescript",
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "browser": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "requireConfigFile": false
+  },
+  "rules": {
+    "@typescript-eslint/ban-ts-comment": "off",
+    "generator-star-spacing": "off",
+    "babel/generator-star-spacing": "off",
+    "arrow-parens": [
+      "warn",
+      "always"
+    ],
+    "no-empty": [
+      "error",
+      {
+        "allowEmptyCatch": true
+      }
+    ],
+    "prefer-promise-reject-errors": "off"
+  }
+}
