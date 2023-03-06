@@ -131,6 +131,10 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
   if (style[tableIndStr]) {
     tableData.ind = htmlSpacingSizeToWordSizeNumber(style[tableIndStr]);
   }
+  const layoutStr = styleCamelCase ? 'msoTableLayoutAlt' : 'mso-table-layout-alt';
+  if (style[layoutStr]) {
+    tableData.layout = style[layoutStr];
+  }
   if (borders) tableData.borders = borders;
   const colWidths = [];
   if (+attributes.width) {
