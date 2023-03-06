@@ -40,7 +40,7 @@ export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode
         ],
       },
       {
-        type: 'element', name: 'w:t', attributes: { 'xml:space': 'preserve' }, elements: [{ type: 'text', text: `${text || ''}` }],
+        type: 'element', name: 'w:t', attributes: (!text || text.startsWith(' ')) ? { 'xml:space': 'preserve' } : {}, elements: [{ type: 'text', text: `${text || ''}` }],
       },
     ],
   };
