@@ -171,13 +171,6 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
       const cellBorders: XmlTableCellBorders = getCellBorderFromStyles(style, styleCamelCase, borders);
       if (cellBorders) cellData.borders = cellBorders;
       if (i === 0) {
-        if (colspan > 1 || !width) {
-          for (let k = 0; k < (colspan || 1); k++) {
-            colWidths.push(0);
-          }
-        } else {
-          colWidths.push(width);
-        }
         tableData.cols = tableData.cols + (colspan > 1 ? colspan : 1);
       }
       if (colspan > 1) commonData.colspan = colspan;
