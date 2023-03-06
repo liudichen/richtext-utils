@@ -127,6 +127,10 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
     tableData.height = +(attributes?.height) * tableAttributeWidthRate || htmlSpacingSizeToWordSizeNumber(style?.height);
   }
   const borders = getTableBordersFromStyles(style, styleCamelCase);
+  const tableIndStr = styleCamelCase ? 'marginLeft' : 'margin-left';
+  if (style[tableIndStr]) {
+    tableData.ind = htmlSpacingSizeToWordSizeNumber(style[tableIndStr]);
+  }
   if (borders) tableData.borders = borders;
   const colWidths = [];
   if (+attributes.width) {
