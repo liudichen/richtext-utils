@@ -1,14 +1,15 @@
 /** 将html转换为约定格式的word xml格式对应的js对象 */
-import { htmlToJson } from '@iimm/shared';
+import { htmlToJson, type HtmlJsonNode } from '@iimm/shared';
 
 import type { GetImageStepTwoParamsFn, HtmlJsonNodeParserOptions, HtmlXmlParamsNode, XmlElementGenerationConfig, XmlNode } from '@/types/index';
 
 import { htmlJsonNodeParser } from './htmlJsonNodeParse';
 import { xmlParamsNodeToXmlElementObj } from './xmlParamsToWordXmlElement';
 
-/** 将html字符串转换为待生成xml对象的参数节点 */
-const htmlToXmlParamsNodes = async (htmlStr: string, getImgStepTwoParamsFn?: GetImageStepTwoParamsFn, options: HtmlJsonNodeParserOptions = {}) => {
-  const jsonArr = htmlToJson(htmlStr, { skipComment: true, skipClass: true, skipScript: true, keepInlineStyle: false, skipStyle: false, skipAttributes: false, styleCamelCase: options?.styleCamelCase || false, attributesCamelCase: options?.attributesCamelCase || false });
+/** 将htmlJson转换为待生成xml对象的参数节点 */
+const htmlJsonToXmlParamsNodes = async (htmlJson: HtmlJsonNode
+| HtmlJsonNode[], getImgStepTwoParamsFn?: GetImageStepTwoParamsFn, options: HtmlJsonNodeParserOptions = {}) => {
+  const jsonArr = Array.isArray(htmlJson) ? htmlJson : (htmlJson ? [ htmlJson ] : []);
   const data: HtmlXmlParamsNode[] = [];
   for (let i = 0; i < jsonArr.length; i++) {
     let node = await htmlJsonNodeParser(jsonArr[i], getImgStepTwoParamsFn, options);
@@ -44,7 +45,12 @@ const htmlToXmlParamsNodes = async (htmlStr: string, getImgStepTwoParamsFn?: Get
  * @param xmlParamsNodeToXmlElementConfig 待生成xml对象的参数节点生成xml对应的js对象时的配置
  */
 const htmlToWordXmlJsElements = async (htmlStr: string, getImgStepTwoParamsFn?: GetImageStepTwoParamsFn, htmlToXmlParamNodesOptions: HtmlJsonNodeParserOptions = {}, xmlParamsNodeToXmlElementConfig: XmlElementGenerationConfig = {}) => {
-  const paramsNodes = await htmlToXmlParamsNodes(htmlStr, getImgStepTwoParamsFn, htmlToXmlParamNodesOptions);
+  const jsonArr = htmlToJson(htmlStr, { skipComment: true, skipClass: true, skipScript: true, keepInlineStyle: true, skipStyle: false, skipAttributes: false, styleCamelCase: htmlToXmlParamNodesOptions?.styleCamelCase || false, attributesCamelCase: htmlToXmlParamNodesOptions?.attributesCamelCase || false });
+  // console.log('===================json', JSON.stringify(jsonArr));
+  const paramsNodes = await htmlJsonToXmlParamsNodes(jsonArr, getImgStepTwoParamsFn, htmlToXmlParamNodesOptions);
+  // console.log('xxxxxxxxxxxxxxxxxNoe', JSON.stringify(paramsNodes));
+  // console.log('*******************************');
+  // console.log('*******************************');
   const elements: XmlNode[] = [];
   for (let i = 0; i < paramsNodes.length; i++) {
     const item = paramsNodes[i] as (HtmlXmlParamsNode[] | HtmlXmlParamsNode);
@@ -61,13 +67,14 @@ const htmlToWordXmlJsElements = async (htmlStr: string, getImgStepTwoParamsFn?: 
       }
     }
   }
+  // console.log('==========', JSON.stringify(elements));
   return elements;
 };
 
 export {
   htmlJsonNodeParser,
   xmlParamsNodeToXmlElementObj,
-  htmlToXmlParamsNodes,
+  htmlJsonToXmlParamsNodes,
   htmlToWordXmlJsElements,
   htmlToJson,
 };
