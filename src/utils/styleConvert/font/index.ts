@@ -22,9 +22,9 @@ export const getFontFamilyFromObjectStyle = (styles: ObjectStyle, onlyHans = tru
   const keys = Object.keys(styles).filter((ele) => ele.includes(styleCamelCase ? 'ontFamily' : 'font-family'));
   if (!keys.length) return;
   const values = keys.map((ele) => styles[ele] as string);
-  let font;
+  let font: string;
   if (keys.includes(styleCamelCase ? 'fontFamily' : 'font-family')) {
-    font = styles[styleCamelCase ? 'fontFamily' : 'font-family'];
+    font = styles[styleCamelCase ? 'fontFamily' : 'font-family'] as string;
   } else {
     const hans = values.find((ele) => isAllChineseWord(ele));
     if (onlyHans) {
