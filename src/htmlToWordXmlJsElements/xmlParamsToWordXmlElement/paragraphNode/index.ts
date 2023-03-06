@@ -16,13 +16,15 @@ export const paragraphXmlParamsNodeToXmlElementObj = (paragraphNode: HtmlXmlPara
     firstLine, firstLineChars,
     hanging, hangingChars,
     align,
-    fontFamily, fontSize,
-    asciiFont, hAnsiFont, eastAsiaFont, csFont,
+    fontFamily, fontSize, fonts,
+    lang, bidiLang,
+    color, kern,
     pStyle,
     listLvl, listNumId,
     items,
   } = paragraphNode;
   const { defaultFontFamily = '宋体', defaultFontSize = 24 } = config || {};
+  const { asciiFont, hAnsiFont, eastAsiaFont, csFont } = fonts || {};
   if (!fontSize) fontSize = defaultFontSize;
   if (!fontFamily) fontFamily = defaultFontFamily;
   let w_pStyle = null;
@@ -112,17 +114,51 @@ export const paragraphXmlParamsNodeToXmlElementObj = (paragraphNode: HtmlXmlPara
       elements: [],
     };
   }
+  let w_color: XmlNode = null;
+  if (color) {
+    w_color = {
+      type: 'element',
+      name: 'w:color',
+      attributes: { 'w:val': `${color}` },
+      elements: [],
+    };
+  }
+  let w_kern: XmlNode = null;
+  if (kern) {
+    w_kern = {
+      type: 'element',
+      name: 'w:kern',
+      attributes: { 'w:val': `${kern}` },
+      elements: [],
+    };
+  }
+  let w_lang: XmlNode = null;
+  if (lang || bidiLang) {
+    w_lang = {
+      type: 'element',
+      name: 'w:lang',
+      attributes: {},
+      elements: [],
+    };
+    if (lang) w_lang.attributes['w:val'] = lang;
+    if (bidiLang) w_lang.attributes['w:bidi'] = bidiLang;
+  }
   let w_rPr = null;
-  if (w_rFonts || w_sz) {
+  if (w_rFonts || w_sz || w_lang || w_color || w_kern) {
     w_rPr = {
       type: 'element',
       name: 'w:rPr',
       elements: [],
     };
     if (w_rFonts) w_rPr.elements.push(w_rFonts);
+    if (w_color) w_rPr.elements.push(w_color);
+    if (w_kern) w_rPr.elements.push(w_kern);
     if (w_sz) {
       w_rPr.elements.push(w_sz);
       w_rPr.elements.push(w_szCs);
+    }
+    if (w_lang) {
+      w_rPr.elements.push(w_lang);
     }
   }
   let w_numPr = null;

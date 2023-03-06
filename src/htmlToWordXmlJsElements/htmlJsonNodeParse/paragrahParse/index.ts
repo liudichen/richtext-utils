@@ -1,6 +1,6 @@
 import type { HtmlJsonNode, ObjectStyle } from '@iimm/shared';
 import type { HtmlJsonNodeParserOptions, HtmlXmlParamsParagrapNode, GetImageStepTwoParamsFn, HtmlXmlParamsTextNode } from '@/types/index';
-import { htmlSpacingSizeToWordSizeNumber, htmlFontSizeToWordFontSizeNumber, splitHtmlMarginString, getFontFamilyFromObjectStyle } from '@/utils/index';
+import { htmlSpacingSizeToWordSizeNumber, htmlFontSizeToWordFontSizeNumber, splitHtmlMarginString, getFontFamilyFromObjectStyle, htmlColorToWordColor } from '@/utils/index';
 
 import { imageHtmlJsonNodeParser } from '../imageParse';
 import { spanHtmlJsonNodeParser } from '../spanParse';
@@ -134,8 +134,20 @@ export const getParagraphParamsFromStyle = (styles: ObjectStyle = {}, onlyHans =
   }
 
   // ========== w:pPr -> w:rPr -> w:rFonts 暂时仅保留汉语字体
-  const font = getFontFamilyFromObjectStyle(styles, onlyHans, styleCamelCase);
-  if (font) data.fontFamily = font;
+  const { fontFamily, fonts } = getFontFamilyFromObjectStyle(styles as ObjectStyle<string>, onlyHans, styleCamelCase);
+  if (fontFamily) data.fontFamily = fontFamily;
+  if (fonts) data.fonts = fonts;
+  if (styles.color) {
+    const color = htmlColorToWordColor(styles.color as string);
+    if (color) data.color = color;
+  }
+  const kernStr = styleCamelCase ? 'msoFontKerning' : 'mso-font-kerning';
+  if (styles[kernStr]) {
+    const kern = htmlSpacingSizeToWordSizeNumber(kernStr);
+    if (kern) {
+      data.kern = kern;
+    }
+  }
   return data;
 };
 
