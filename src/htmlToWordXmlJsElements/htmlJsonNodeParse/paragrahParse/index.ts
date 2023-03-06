@@ -1,5 +1,5 @@
 import type { HtmlJsonNode, ObjectStyle } from '@iimm/shared';
-import type { HtmlJsonNodeParserOptions, HtmlXmlParamsParagrapNode, GetImageStepTwoParamsFn } from '@/types/index';
+import type { HtmlJsonNodeParserOptions, HtmlXmlParamsParagrapNode, GetImageStepTwoParamsFn, HtmlXmlParamsTextNode } from '@/types/index';
 import { htmlSpacingSizeToWordSizeNumber, htmlFontSizeToWordFontSizeNumber, splitHtmlMarginString, getFontFamilyFromObjectStyle } from '@/utils/index';
 
 import { imageHtmlJsonNodeParser } from '../imageParse';
@@ -40,7 +40,7 @@ export const getParagraphParamsFromStyle = (styles: ObjectStyle = {}, onlyHans =
   // ====================
   // ===============
   // ===== w:pPr -> w:rPr -> w:sz/w:szCs
-  let fontSize = null;
+  let fontSize: number;
   const fsStr = styleCamelCase ? 'fontSize' : 'font-size';
   if (keys.includes(fsStr)) {
     fontSize = htmlFontSizeToWordFontSizeNumber(styles[fsStr]);
@@ -155,11 +155,10 @@ export const paragraphHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageSt
     }
     if (tagName === 'span') {
       const result = [];
-      const parentStyle = {};
-      const ffStr = styleCamelCase ? 'fontFamily' : 'font-family';
-      const fsStr = styleCamelCase ? 'fontSize' : 'font-size';
-      if (style[ffStr]) parentStyle[ffStr] = style[ffStr];
-      if (style[fsStr]) parentStyle[fsStr] = style[fsStr];
+      /** 将段落的字体和字号向下作为默认值传递给下面的span节点 */
+      const parentStyle: Partial<HtmlXmlParamsTextNode> = {};
+      if (paragraphParams.fontFamily) parentStyle.fontFamily = paragraphParams.fontFamily;
+      if (paragraphParams.fontSize) parentStyle.fontSize = paragraphParams.fontSize;
       await spanHtmlJsonNodeParser(child, {}, parentStyle, result, getImageStepTwoParamsFn, pTagName === 'li' ? paragraphParams : undefined, options);
       items.push(...result);
       if (!data.length) imgFirst = false;

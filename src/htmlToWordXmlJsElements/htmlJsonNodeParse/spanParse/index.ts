@@ -1,5 +1,5 @@
 import { type HtmlJsonNode, camelCase } from '@iimm/shared';
-import type { HtmlJsonNodeParserOptions, GetImageStepTwoParamsFn, SpanSpecialStyles, HtmlXmlParamsTextNode } from '@/types/index';
+import type { HtmlJsonNodeParserOptions, GetImageStepTwoParamsFn, SpanSpecialStyles, HtmlXmlParamsTextNode, HtmlXmlParamsParagrapNode } from '@/types/index';
 import { htmlColorToWordColor, getFontFamilyFromObjectStyle, htmlFontSizeToWordFontSizeNumber } from '@/utils/index';
 
 import { getParagraphParamsFromStyle } from '../paragrahParse';
@@ -63,12 +63,21 @@ export const getTextParamsFromStyles = (styles: any, onlyHans = true, styleCamel
   data.text = (styles.text || '').replace(/&nbsp;/g, ' ');
   return data;
 };
-
-export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: SpanSpecialStyles = {}, parentStyles = {}, result = [], getImageStepTwoParamsFn: GetImageStepTwoParamsFn, paragraghParams, options?: HtmlJsonNodeParserOptions) => {
+/**
+ * 解析span节点(或li节点)及其下面的内容
+ * @param node HmtlJosonNode参数节点
+ * @param specailStyles 从上层span传递下来的诸如加粗/斜体等格式
+ * @param parentStyles 从段落传递下来的默认字体和字号格式
+ * @param result 存放解析后结果
+ * @param getImageStepTwoParamsFn 处理图片的step2函数
+ * @param paragraghParams 由于li本身没有styLe导致没有段落格式，在父节点为li时，传递解析的空参数表下来以从第1各子节点获取段落格式
+ * @param options 解析配置
+ */
+export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: SpanSpecialStyles = {}, parentStyles: Partial<HtmlXmlParamsTextNode> = {}, result = [], getImageStepTwoParamsFn?: GetImageStepTwoParamsFn, paragraghParams?: HtmlXmlParamsParagrapNode, options?: HtmlJsonNodeParserOptions) => {
   const { NODENAME = 'name', TEXTTAG = 'text', TEXTVALUE = 'text', CHILDREN = 'elements', STYLE = 'style', onlyHans = true, styleCamelCase = false } = options || {};
   const { [NODENAME]: tagName, type, [STYLE]: style = {}, [TEXTVALUE]: text, [CHILDREN]: children } = node;
+  const textParams = { ...(parentStyles || {}), ...getTextParamsFromStyles({ ...specailStyles, ...style, text }, onlyHans, styleCamelCase) };
   if (type === TEXTTAG) {
-    const textParams = { ...(parentStyles || {}), ...getTextParamsFromStyles({ ...specailStyles, ...style, text }, onlyHans, styleCamelCase) };
     result.push({ type: 'text', ...textParams });
   } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName) || style.border) {
     const newSpecialStyles: SpanSpecialStyles = { ...specailStyles };
@@ -107,9 +116,10 @@ export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: 
     }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...parentStyles, ...style }, result, getImageStepTwoParamsFn, undefined, options);
+      await spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...textParams }, result, getImageStepTwoParamsFn, undefined, options);
     }
   } else if (tagName === 'span') {
+    /** 从li的第1层span子节点，获得li的段落格式 */
     if (paragraghParams) {
       const pStyle = getParagraphParamsFromStyle(style, onlyHans, styleCamelCase);
       const keys = Object.keys(pStyle);
@@ -124,7 +134,7 @@ export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: 
     }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...parentStyles, ...style }, result, getImageStepTwoParamsFn, undefined, options);
+      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...textParams }, result, getImageStepTwoParamsFn, undefined, options);
     }
   } else if (tagName === 'img') {
     const res = await imageHtmlJsonNodeParser(node, getImageStepTwoParamsFn, options);
