@@ -1,5 +1,5 @@
 import type { HtmlJsonNode } from '@iimm/shared';
-import type { HtmlJsonNodeParserOptions, GetImageStepTwoParamsFn } from '@/types/index';
+import type { HtmlJsonNodeParserOptions, GetImageStepTwoParamsFn, HtmlXmlParamsNode } from '@/types/index';
 
 import { paragraphHtmlJsonNodeParser } from './paragrahParse';
 import { imageHtmlJsonNodeParser } from './imageParse';
@@ -20,9 +20,9 @@ export const htmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTwoPara
   const { type, [NODENAME]: tagName, [CHILDREN]: children } = node;
   if (type === NODETAG && ignoreTags.includes(tagName)) { return false; }
   if (tagName === 'figure') {
-    const childs = children.filter((ele) => !/^fig/.test(ele[NODENAME]));
+    const childs = children.filter((ele: HtmlXmlParamsNode) => !/^fig/.test(ele[NODENAME]));
     if (!childs.length) return false;
-    if (!childs.find((ele) => ele[NODENAME] === 'p' || ele[NODENAME] === 'table')) {
+    if (!childs.find((ele: HtmlXmlParamsNode) => ele[NODENAME] === 'p' || ele[NODENAME] === 'table')) {
       return await paragraphHtmlJsonNodeParser(node, getImageStepTwoParamsFn, options);
     }
     const data = [];
