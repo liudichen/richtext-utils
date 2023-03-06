@@ -44,7 +44,7 @@ export const getParagraphParamsFromStyle = (styles: ObjectStyle = {}, onlyHans =
   const fsStr = styleCamelCase ? 'fontSize' : 'font-size';
   if (keys.includes(fsStr)) {
     fontSize = htmlFontSizeToWordFontSizeNumber(styles[fsStr]);
-    data.fontSize = fontSize;
+    if (fontSize) data.fontSize = fontSize;
   }
   // ============================
   // ===== w:pPr -> w:ind =====
