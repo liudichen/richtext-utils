@@ -21,9 +21,7 @@ export const tableXmlParamsNodeToXmlElementObj = (tableNode: HtmlXmlParamsTableN
   const { tableMaxWidth } = config || {};
   const w_tblGrid: XmlNode = {
     type: 'element', name: 'w:tblGrid',
-    elements: [
-      { type: 'element', name: 'w:tblStyles', attributes: { 'w:val': 'a6' }, elements: [] },
-    ],
+    elements: [ ],
   };
   for (let i = 0; i < cols; i++) {
     const w_gridCol: XmlNode = {
