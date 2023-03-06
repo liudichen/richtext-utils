@@ -12,7 +12,8 @@ export const getTextParamsFromStyles = (styles: any, onlyHans = true, styleCamel
   const data: HtmlXmlParamsTextNode = {};
   const keys = Object.keys(styles || {});
   if (!keys.length) return {};
-  data.fontFamily = getFontFamilyFromObjectStyle(styles, onlyHans, styleCamelCase);
+  const fontFamily = getFontFamilyFromObjectStyle(styles, onlyHans, styleCamelCase);
+  if (fontFamily) data.fontFamily = fontFamily;
   // w:kern
   const mKernStr = styleCamelCase ? 'msoFontKerning' : 'mso-font-kerning';
   if (keys.includes(mKernStr)) {
@@ -67,7 +68,7 @@ export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: 
   const { NODENAME = 'name', TEXTTAG = 'text', TEXTVALUE = 'text', CHILDREN = 'elements', STYLE = 'style', onlyHans = true, styleCamelCase = false } = options || {};
   const { [NODENAME]: tagName, type, [STYLE]: style = {}, [TEXTVALUE]: text, [CHILDREN]: children } = node;
   if (type === TEXTTAG) {
-    const textParams = getTextParamsFromStyles({ ...parentStyles, ...specailStyles, ...style, text }, onlyHans, styleCamelCase);
+    const textParams = { ...(parentStyles || {}), ...getTextParamsFromStyles({ ...specailStyles, ...style, text }, onlyHans, styleCamelCase) };
     result.push({ type: 'text', ...textParams });
   } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName) || style.border) {
     const newSpecialStyles: SpanSpecialStyles = { ...specailStyles };
