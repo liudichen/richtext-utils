@@ -26,9 +26,9 @@ const fontStringTrans = (font: string) => {
 };
 
 export const getFontFamilyFromObjectStyle = (styles: ObjectStyle<string>, onlyHans = true, styleCamelCase = false) => {
-  if (!styles || typeof styles !== 'object') return;
+  if (!styles || typeof styles !== 'object') return {};
   const keys = Object.keys(styles).filter((ele) => ele.includes(styleCamelCase ? 'ontFamily' : 'font-family'));
-  if (!keys.length) return;
+  if (!keys.length) return {};
   const values = keys.map((ele) => styles[ele] as string);
   let font: string;
   let fonts: WordXmlFonts;
@@ -67,6 +67,7 @@ export const getFontFamilyFromObjectStyle = (styles: ObjectStyle<string>, onlyHa
 };
 
 export const getLangFromObjectStyle = (styles: ObjectStyle = {}, styleCamelCase = false) => {
+  if (!styles || typeof styles !== 'object') return {};
   let lang: string;
   let bidiLang: string;
   const langName = styleCamelCase ? 'msoLanguage' : 'mso-language';
