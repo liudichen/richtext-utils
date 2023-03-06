@@ -80,13 +80,22 @@ export const getTextParamsFromStyles = (styles: any, onlyHans = true, styleCamel
 export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: SpanSpecialStyles = {}, parentStyles: Partial<HtmlXmlParamsTextNode> = {}, result = [], getImageStepTwoParamsFn?: GetImageStepTwoParamsFn, paragraghParams?: HtmlXmlParamsParagrapNode, options?: HtmlJsonNodeParserOptions) => {
   const { NODENAME = 'name', TEXTTAG = 'text', TEXTVALUE = 'text', CHILDREN = 'elements', STYLE = 'style', onlyHans = true, styleCamelCase = false } = options || {};
   const { [NODENAME]: tagName, type, [STYLE]: style = {}, [TEXTVALUE]: text, [CHILDREN]: children } = node;
-  const textParams = { ...(parentStyles || {}), ...getTextParamsFromStyles({ ...specailStyles, ...style, text }, onlyHans, styleCamelCase) };
-  const tPStyle: Partial<HtmlXmlParamsTextNode> = {};
-  if (textParams.fontFamily) tPStyle.fontFamily = textParams.fontFamily;
-  if (textParams.fontSize) tPStyle.fontSize = textParams.fontSize;
-  if (textParams.color) tPStyle.color = textParams.color;
+  const textParams = { fontFamily: parentStyles.fontFamily, fontSize: parentStyles.fontSize, color: parentStyles.color, ...getTextParamsFromStyles({ ...specailStyles, ...style, text }, onlyHans, styleCamelCase) };
+  /** 从li的第1层span子节点，获得li的段落格式 */
+  if (paragraghParams) {
+    const pStyle = getParagraphParamsFromStyle(style, onlyHans, styleCamelCase);
+    const keys = Object.keys(pStyle);
+    if (keys.length > 1) {
+      for (let k = 0; k < keys.length; k++) {
+        const attr = keys[k];
+        if (attr !== 'p' && !paragraghParams[attr]) {
+          paragraghParams[attr] = pStyle[attr];
+        }
+      }
+    }
+  }
   if (type === TEXTTAG) {
-    result.push({ type: 'text', ...textParams });
+    result.push({ ...parentStyles, ...textParams, type: 'text' });
   } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName) || style.border) {
     const newSpecialStyles: SpanSpecialStyles = { ...specailStyles };
     if (tagName === 'b' || tagName === 'strong') {
@@ -124,25 +133,12 @@ export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: 
     }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, newSpecialStyles, tPStyle, result, getImageStepTwoParamsFn, undefined, options);
+      await spanHtmlJsonNodeParser(ele, newSpecialStyles, textParams, result, getImageStepTwoParamsFn, undefined, options);
     }
   } else if (tagName === 'span') {
-    /** 从li的第1层span子节点，获得li的段落格式 */
-    if (paragraghParams) {
-      const pStyle = getParagraphParamsFromStyle(style, onlyHans, styleCamelCase);
-      const keys = Object.keys(pStyle);
-      if (keys.length > 1) {
-        for (let k = 0; k < keys.length; k++) {
-          const attr = keys[k];
-          if (attr !== 'p' && !paragraghParams[attr]) {
-            paragraghParams[attr] = pStyle[attr];
-          }
-        }
-      }
-    }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, tPStyle, result, getImageStepTwoParamsFn, undefined, options);
+      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, textParams, result, getImageStepTwoParamsFn, undefined, options);
     }
   } else if (tagName === 'img') {
     const res = await imageHtmlJsonNodeParser(node, getImageStepTwoParamsFn, options);

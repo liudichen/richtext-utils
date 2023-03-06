@@ -2,7 +2,7 @@ import type { HtmlXmlParamsTextNode, XmlElementGenerationConfig, XmlNode } from 
 
 export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode, config :XmlElementGenerationConfig = {}) => {
   const {
-    fontFamily: fontFamilyProp, // 字体
+    fontFamily, // 字体
     text, // 文本
     fontSize: fontSizeProp, // 小四
     bold, // 加粗
@@ -21,7 +21,6 @@ export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode
     borderColor,
   } = textNode;
   const { defaultFontFamily = '宋体', defaultFontSize = 24 } = config || {};
-  const fontFamily = fontFamilyProp ?? defaultFontFamily;
   const { asciiFont, hAnsiFont, eastAsiaFont, csFont } = fonts || {};
   const fontSize = fontSizeProp ?? defaultFontSize;
   const w_r: XmlNode = {
@@ -47,7 +46,12 @@ export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode
     ],
   };
 
-  let w_rFonts = null;
+  let w_rFonts: XmlNode = {
+    type: 'element',
+    name: 'w:rFonts',
+    attributes: { 'w:hAnsi': defaultFontFamily, 'w:ascii': defaultFontFamily, 'w:eastAsia': defaultFontFamily, 'w:hint': 'eastAsia' },
+    elements: [],
+  };
   if (fontFamily || asciiFont || hAnsiFont || eastAsiaFont || csFont) {
     w_rFonts = {
       type: 'element',
@@ -55,18 +59,16 @@ export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode
       attributes: { 'w:hint': 'eastAsia' },
       elements: [],
     };
-    if (asciiFont || hAnsiFont || eastAsiaFont || csFont) {
+    if (fontFamily) {
+      w_rFonts.attributes = { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' };
+    } else {
       if (asciiFont) w_rFonts.attributes['w:ascii'] = asciiFont;
       if (hAnsiFont) w_rFonts.attributes['w:hAnsi'] = hAnsiFont;
       if (eastAsiaFont) w_rFonts.attributes['w:eastAsia'] = eastAsiaFont;
       if (csFont) w_rFonts.attributes['w:cs'] = csFont;
-    } else {
-      w_rFonts.attributes = { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' };
     }
   }
-  if (w_rFonts) {
-    w_r.elements[0].elements[0] = w_rFonts;
-  }
+  w_r.elements[0].elements[0] = w_rFonts;
   if (typeof kern !== 'undefined') {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:kern', attributes: { 'w:val': `${kern}` }, elements: [] });
   }

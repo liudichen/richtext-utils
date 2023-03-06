@@ -26,7 +26,6 @@ export const paragraphXmlParamsNodeToXmlElementObj = (paragraphNode: HtmlXmlPara
   const { defaultFontFamily = '宋体', defaultFontSize = 24 } = config || {};
   const { asciiFont, hAnsiFont, eastAsiaFont, csFont } = fonts || {};
   if (!fontSize) fontSize = defaultFontSize;
-  if (!fontFamily) fontFamily = defaultFontFamily;
   let w_pStyle = null;
   if (pStyle) {
     w_pStyle = {
@@ -77,7 +76,12 @@ export const paragraphXmlParamsNodeToXmlElementObj = (paragraphNode: HtmlXmlPara
       },
       elements: [] };
   }
-  let w_rFonts = null;
+  let w_rFonts: XmlNode = {
+    type: 'element',
+    name: 'w:rFonts',
+    attributes: { 'w:hAnsi': defaultFontFamily, 'w:ascii': defaultFontFamily, 'w:eastAsia': defaultFontFamily, 'w:hint': 'eastAsia' },
+    elements: [],
+  };
   if (fontFamily || asciiFont || hAnsiFont || eastAsiaFont || csFont) {
     w_rFonts = {
       type: 'element',
@@ -85,13 +89,13 @@ export const paragraphXmlParamsNodeToXmlElementObj = (paragraphNode: HtmlXmlPara
       attributes: { 'w:hint': 'eastAsia' },
       elements: [],
     };
-    if (asciiFont || hAnsiFont || eastAsiaFont || csFont) {
+    if (fontFamily) {
+      w_rFonts.attributes = { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' };
+    } else {
       if (asciiFont) w_rFonts.attributes['w:ascii'] = asciiFont;
       if (hAnsiFont) w_rFonts.attributes['w:hAnsi'] = hAnsiFont;
       if (eastAsiaFont) w_rFonts.attributes['w:eastAsia'] = eastAsiaFont;
       if (csFont) w_rFonts.attributes['w:cs'] = csFont;
-    } else {
-      w_rFonts.attributes = { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' };
     }
   }
   let w_sz = null;

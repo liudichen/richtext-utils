@@ -75,7 +75,7 @@ export interface HtmlXmlParamsParagrapNode extends WordXmlLang {
 
   /** 对齐方式: left/center/right/justify/distribute，对用style为text-align,word默认是两端对齐justify，此时不需要插入内容 */
   align?: 'left'|'center'|'right'|'justify'|'distribute',
-  /** 如果没有其他字体定义则全部采用此字体
+  /** 如果有此属性则强制采用此字体
    * @default '宋体''
    */
   fontFamily?: string,
@@ -138,7 +138,7 @@ export interface HtmlXmlParamsImageNode {
 /** 经过处理的待转化为xml对象的文字属性 */
 export interface HtmlXmlParamsTextNode extends SpanSpecialStyles, WordXmlLang {
   type?: 'text',
-  /** 如果没有其他字体定义则全部采用此字体
+  /** 如果有此属性则强制采用此字体
    * @default '宋体''
    */
   fontFamily?: string,

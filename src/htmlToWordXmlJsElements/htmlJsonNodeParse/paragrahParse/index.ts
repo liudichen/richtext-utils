@@ -165,16 +165,15 @@ export const paragraphHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageSt
     const child = children[i];
     const { [NODENAME]: tagName, type, [TEXTVALUE]: text } = child;
     if (type === TEXTTAG) {
-      items.push({ type, text });
+      items.push({ ...paragraphParams, type, text });
       if (!data.length) imgFirst = false;
     }
     if (tagName === 'span') {
       const result = [];
       /** 将段落的字体和字号向下作为默认值传递给下面的span节点 */
-      const parentStyle: Partial<HtmlXmlParamsTextNode> = {};
-      if (paragraphParams.fontFamily) parentStyle.fontFamily = paragraphParams.fontFamily;
-      if (paragraphParams.fontSize) parentStyle.fontSize = paragraphParams.fontSize;
-      await spanHtmlJsonNodeParser(child, {}, parentStyle, result, getImageStepTwoParamsFn, pTagName === 'li' ? paragraphParams : undefined, options);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { type, ...parentStyle } = paragraphParams;
+      await spanHtmlJsonNodeParser(child, {}, parentStyle as HtmlXmlParamsTextNode, result, getImageStepTwoParamsFn, pTagName === 'li' ? paragraphParams : undefined, options);
       items.push(...result);
       if (!data.length) imgFirst = false;
     } else if (tagName === 'img') { // 内联图片可以任务是p的子元素

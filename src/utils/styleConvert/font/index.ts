@@ -1,4 +1,7 @@
-import { isAllChineseWord, type ObjectStyle } from '@iimm/shared';
+import {
+  // isAllChineseWord,
+  type ObjectStyle,
+} from '@iimm/shared';
 import type { WordXmlFonts } from '@/types/index';
 
 export const htmlFontSizeToWordFontSizeNumber = (fontSize?: string | number) => {
@@ -19,26 +22,27 @@ export const htmlFontSizeToWordFontSizeNumber = (fontSize?: string | number) => 
 };
 
 const fontStringTrans = (font: string) => {
-  const res = font.replace(/&quot;/g, '').replace(/"/g, '');
+  if (typeof font !== 'string') return null;
+  const res = font.replace(new RegExp('&quot;', 'g'), '').replace(new RegExp('"', 'g'), '');
   if (res.includes(',')) {
-    return res.split(',')?.[0]?.trim();
+    return res.split(',')?.[0]?.trim() || null;
   }
+  return res;
 };
 
-export const getFontFamilyFromObjectStyle = (styles: ObjectStyle<string>, onlyHans = true, styleCamelCase = false) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getFontFamilyFromObjectStyle = (styles: ObjectStyle<string> = {}, onlyHans = true, styleCamelCase = false) => {
   if (!styles || typeof styles !== 'object') return {};
-  const keys = Object.keys(styles).filter((ele) => ele.includes(styleCamelCase ? 'ontFamily' : 'font-family'));
-  if (!keys.length) return {};
-  const values = keys.map((ele) => styles[ele] as string);
-  let font: string;
-  let fonts: WordXmlFonts;
-  if (keys.includes(styleCamelCase ? 'fontFamily' : 'font-family')) {
-    font = styles[styleCamelCase ? 'fontFamily' : 'font-family'] as string;
+  let font: string = null;
+  let fonts: WordXmlFonts = null;
+  if (styles[styleCamelCase ? 'fontFamily' : 'font-family']) {
+    font = fontStringTrans(styles[styleCamelCase ? 'fontFamily' : 'font-family'] as string);
   } else {
-    const hans = values.find((ele) => isAllChineseWord(ele));
-    if (onlyHans) {
-      font = hans;
-    }
+    // const values = keys.map((ele) => styles[ele] as string);
+    // const hans = values.find((ele) => isAllChineseWord(ele));
+    // if (onlyHans) {
+    //   font = hans;
+    // }
   }
   // 'mso-hansi-font-family', 'mso-ascii-font-family', 'mso-bidi-font-family', 'mso-fareast-font-family'
   const hansi = styleCamelCase ? 'msoHansiFontFamily' : 'mso-hansi-font-family';
@@ -57,9 +61,6 @@ export const getFontFamilyFromObjectStyle = (styles: ObjectStyle<string>, onlyHa
   if (styles[bidi]) {
     fonts = { ...(fonts || {}), csFont: fontStringTrans(styles[bidi]) };
   }
-  if (font) {
-    font = fontStringTrans(font);
-  }
   return {
     fontFamily: font,
     fonts,
@@ -68,12 +69,12 @@ export const getFontFamilyFromObjectStyle = (styles: ObjectStyle<string>, onlyHa
 
 export const getLangFromObjectStyle = (styles: ObjectStyle = {}, styleCamelCase = false) => {
   if (!styles || typeof styles !== 'object') return {};
-  let lang: string;
-  let bidiLang: string;
+  let lang: string = null;
+  let bidiLang: string = null;
   const langName = styleCamelCase ? 'msoLanguage' : 'mso-language';
   const bidiLangName = styleCamelCase ? 'msoBidiLanguage' : 'mso-bidi-language';
   if (styles[langName]) lang = `${styles[langName]}`.toLowerCase();
-  if (styles[bidiLangName]) bidiLang = `${styles[bidiLang]}`.toLowerCase();
+  if (styles[bidiLangName]) bidiLang = `${styles[bidiLangName]}`.toLowerCase();
   return {
     lang, bidiLang,
   };

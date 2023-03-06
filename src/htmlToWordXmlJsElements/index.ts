@@ -46,11 +46,7 @@ const htmlJsonToXmlParamsNodes = async (htmlJson: HtmlJsonNode
  */
 const htmlToWordXmlJsElements = async (htmlStr: string, getImgStepTwoParamsFn?: GetImageStepTwoParamsFn, htmlToXmlParamNodesOptions: HtmlJsonNodeParserOptions = {}, xmlParamsNodeToXmlElementConfig: XmlElementGenerationConfig = {}) => {
   const jsonArr = htmlToJson(htmlStr, { skipComment: true, skipClass: true, skipScript: true, keepInlineStyle: true, skipStyle: false, skipAttributes: false, styleCamelCase: htmlToXmlParamNodesOptions?.styleCamelCase || false, attributesCamelCase: htmlToXmlParamNodesOptions?.attributesCamelCase || false });
-  // console.log('===================json', JSON.stringify(jsonArr));
   const paramsNodes = await htmlJsonToXmlParamsNodes(jsonArr, getImgStepTwoParamsFn, htmlToXmlParamNodesOptions);
-  // console.log('xxxxxxxxxxxxxxxxxNoe', JSON.stringify(paramsNodes));
-  // console.log('*******************************');
-  // console.log('*******************************');
   const elements: XmlNode[] = [];
   for (let i = 0; i < paramsNodes.length; i++) {
     const item = paramsNodes[i] as (HtmlXmlParamsNode[] | HtmlXmlParamsNode);
@@ -67,7 +63,6 @@ const htmlToWordXmlJsElements = async (htmlStr: string, getImgStepTwoParamsFn?: 
       }
     }
   }
-  // console.log('==========', JSON.stringify(elements));
   return elements;
 };
 
