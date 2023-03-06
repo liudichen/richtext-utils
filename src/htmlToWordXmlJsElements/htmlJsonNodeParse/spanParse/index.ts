@@ -1,6 +1,6 @@
 import { type HtmlJsonNode, camelCase } from '@iimm/shared';
 import type { HtmlJsonNodeParserOptions, GetImageStepTwoParamsFn, SpanSpecialStyles, HtmlXmlParamsTextNode, HtmlXmlParamsParagrapNode } from '@/types/index';
-import { htmlColorToWordColor, getFontFamilyFromObjectStyle, htmlFontSizeToWordFontSizeNumber } from '@/utils/index';
+import { htmlColorToWordColor, getFontFamilyFromObjectStyle, htmlFontSizeToWordFontSizeNumber, getLangFromObjectStyle } from '@/utils/index';
 
 import { getParagraphParamsFromStyle } from '../paragrahParse';
 import { imageHtmlJsonNodeParser } from '../imageParse';
@@ -12,8 +12,9 @@ export const getTextParamsFromStyles = (styles: any, onlyHans = true, styleCamel
   const data: HtmlXmlParamsTextNode = {};
   const keys = Object.keys(styles || {});
   if (!keys.length) return {};
-  const fontFamily = getFontFamilyFromObjectStyle(styles, onlyHans, styleCamelCase);
+  const { fontFamily, fonts } = getFontFamilyFromObjectStyle(styles, onlyHans, styleCamelCase);
   if (fontFamily) data.fontFamily = fontFamily;
+  if (fonts) data.fonts = fonts;
   // w:kern
   const mKernStr = styleCamelCase ? 'msoFontKerning' : 'mso-font-kerning';
   if (keys.includes(mKernStr)) {
@@ -61,6 +62,9 @@ export const getTextParamsFromStyles = (styles: any, onlyHans = true, styleCamel
     }
   }
   data.text = (styles.text || '').replace(/&nbsp;/g, ' ');
+  const { lang, bidiLang } = getLangFromObjectStyle(styles, styleCamelCase);
+  if (lang) data.lang = lang;
+  if (bidiLang) data.bidiLang = bidiLang;
   return data;
 };
 /**
@@ -77,6 +81,10 @@ export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: 
   const { NODENAME = 'name', TEXTTAG = 'text', TEXTVALUE = 'text', CHILDREN = 'elements', STYLE = 'style', onlyHans = true, styleCamelCase = false } = options || {};
   const { [NODENAME]: tagName, type, [STYLE]: style = {}, [TEXTVALUE]: text, [CHILDREN]: children } = node;
   const textParams = { ...(parentStyles || {}), ...getTextParamsFromStyles({ ...specailStyles, ...style, text }, onlyHans, styleCamelCase) };
+  const tPStyle: Partial<HtmlXmlParamsTextNode> = {};
+  if (textParams.fontFamily) tPStyle.fontFamily = textParams.fontFamily;
+  if (textParams.fontSize) tPStyle.fontSize = textParams.fontSize;
+  if (textParams.color) tPStyle.color = textParams.color;
   if (type === TEXTTAG) {
     result.push({ type: 'text', ...textParams });
   } else if ([ 'b', 'strong', 'em', 'i', 'u', 's', 'sub', 'sup' ].includes(tagName) || style.border) {
@@ -116,7 +124,7 @@ export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: 
     }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, newSpecialStyles, { ...textParams }, result, getImageStepTwoParamsFn, undefined, options);
+      await spanHtmlJsonNodeParser(ele, newSpecialStyles, tPStyle, result, getImageStepTwoParamsFn, undefined, options);
     }
   } else if (tagName === 'span') {
     /** 从li的第1层span子节点，获得li的段落格式 */
@@ -134,7 +142,7 @@ export const spanHtmlJsonNodeParser = async (node: HtmlJsonNode, specailStyles: 
     }
     for (let i = 0; i < children?.length; i++) {
       const ele = children[i];
-      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, { ...textParams }, result, getImageStepTwoParamsFn, undefined, options);
+      await spanHtmlJsonNodeParser(ele, { ...specailStyles }, tPStyle, result, getImageStepTwoParamsFn, undefined, options);
     }
   } else if (tagName === 'img') {
     const res = await imageHtmlJsonNodeParser(node, getImageStepTwoParamsFn, options);

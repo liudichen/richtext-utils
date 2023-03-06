@@ -1,6 +1,6 @@
 import type { HtmlJsonNode, ObjectStyle } from '@iimm/shared';
 import type { HtmlJsonNodeParserOptions, HtmlXmlParamsParagrapNode, GetImageStepTwoParamsFn, HtmlXmlParamsTextNode } from '@/types/index';
-import { htmlSpacingSizeToWordSizeNumber, htmlFontSizeToWordFontSizeNumber, splitHtmlMarginString, getFontFamilyFromObjectStyle, htmlColorToWordColor } from '@/utils/index';
+import { htmlSpacingSizeToWordSizeNumber, htmlFontSizeToWordFontSizeNumber, splitHtmlMarginString, getFontFamilyFromObjectStyle, htmlColorToWordColor, getLangFromObjectStyle } from '@/utils/index';
 
 import { imageHtmlJsonNodeParser } from '../imageParse';
 import { spanHtmlJsonNodeParser } from '../spanParse';
@@ -148,6 +148,9 @@ export const getParagraphParamsFromStyle = (styles: ObjectStyle = {}, onlyHans =
       data.kern = kern;
     }
   }
+  const { lang, bidiLang } = getLangFromObjectStyle(styles, styleCamelCase);
+  if (lang) data.lang = lang;
+  if (bidiLang) data.bidiLang = bidiLang;
   return data;
 };
 

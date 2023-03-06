@@ -41,7 +41,7 @@ export interface XmlElementGenerationConfig {
 }
 
 /** 经过处理的待转化为xml对象的段落节点 */
-export interface HtmlXmlParamsParagrapNode {
+export interface HtmlXmlParamsParagrapNode extends WordXmlLang {
   type: 'p',
   /** 行距/行高(style中对应 line-height单位是%时是多倍行距，是pt时为固定行距) */
   line?: number,
@@ -75,17 +75,15 @@ export interface HtmlXmlParamsParagrapNode {
 
   /** 对齐方式: left/center/right/justify/distribute，对用style为text-align,word默认是两端对齐justify，此时不需要插入内容 */
   align?: 'left'|'center'|'right'|'justify'|'distribute',
-  /** 字体 */
+  /** 如果没有其他字体定义则全部采用此字体
+   * @default '宋体''
+   */
   fontFamily?: string,
-  /** w:ascii */
-  asciiFont?: string,
-  /** w:hAnsi */
-  hAnsiFont?: string,
-  /** w:astAsia */
-  eastAsiaFont?: string,
-  /** w:cs */
-  csFont?: string,
+  fonts?: WordXmlFonts,
   fontSize?: number,
+  /** 如果没有其他字体定义则全部采用此字体
+   * @default '宋体''
+   */
   /** 段落预定义样式，如标题等级 */
   pStyle?: string, // 预定义样式名，如标题等级
 
@@ -95,6 +93,8 @@ export interface HtmlXmlParamsParagrapNode {
 
   items?: (HtmlXmlParamsImageNode | HtmlXmlParamsTextNode | HtmlXmlParamsTableNode)[],
 
+  color?: string,
+  kern?: string | number,
 }
 
 export interface HtmlXmlParamsImageNodeStepOne {
@@ -103,6 +103,25 @@ export interface HtmlXmlParamsImageNodeStepOne {
   cx?: number,
   cy?: number,
   src: string,
+}
+
+/** 对应wordXml里的wr:Fonts */
+export interface WordXmlFonts {
+  /** style中对应 mso-ascii-font-family wr:Fonts对应属性w:ascii */
+  asciiFont?: string,
+  /** style中对应 mso-ascii-font-family wr:Fonts对应属性w:hAnsi */
+  hAnsiFont?: string,
+  /** style中对应 mso-ascii-font-family wr:Fonts对应属性w:eastAsia */
+  eastAsiaFont?: string,
+  /** style中对应 mso-ascii-font-family wr:Fonts对应属性w:cs */
+  csFont?: string,
+}
+
+/** 对应wordXml里的 w:lang */
+export interface WordXmlLang {
+  lang?: string,
+  /** style中对应 mso-bidi-language w:lang对应属性w:bidi */
+  bidiLang?: string,
 }
 
 /** 经过处理的待转化为xml对象的图片节点 */
@@ -117,15 +136,13 @@ export interface HtmlXmlParamsImageNode {
 }
 
 /** 经过处理的待转化为xml对象的文字属性 */
-export interface HtmlXmlParamsTextNode extends SpanSpecialStyles{
+export interface HtmlXmlParamsTextNode extends SpanSpecialStyles, WordXmlLang {
   type?: 'text',
-  /** 字体
-   * @default 宋体
+  /** 如果没有其他字体定义则全部采用此字体
+   * @default '宋体''
    */
   fontFamily?: string,
-  /** 字号
-   * @default 24
-   */
+  fonts?: WordXmlFonts,
   fontSize?: number | string,
   color?: string,
   /** 文本 */

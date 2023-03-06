@@ -40,6 +40,6 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@iimm/shared": "^2.1.0"
+    "@iimm/shared": "^2.1.2"
   }
 }

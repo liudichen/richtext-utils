@@ -17,10 +17,12 @@ export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode
     // shd, // 文字底纹
     kern, // 字间距单位pt
     border, // 文本外框
+    fonts, lang, bidiLang,
     borderColor,
   } = textNode;
   const { defaultFontFamily = '宋体', defaultFontSize = 24 } = config || {};
   const fontFamily = fontFamilyProp ?? defaultFontFamily;
+  const { asciiFont, hAnsiFont, eastAsiaFont, csFont } = fonts || {};
   const fontSize = fontSizeProp ?? defaultFontSize;
   const w_r: XmlNode = {
     type: 'element',
@@ -44,8 +46,26 @@ export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode
       },
     ],
   };
-  if (fontFamily) {
-    w_r.elements[0].elements[0].attributes = { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' };
+
+  let w_rFonts = null;
+  if (fontFamily || asciiFont || hAnsiFont || eastAsiaFont || csFont) {
+    w_rFonts = {
+      type: 'element',
+      name: 'w:rFonts',
+      attributes: { 'w:hint': 'eastAsia' },
+      elements: [],
+    };
+    if (asciiFont || hAnsiFont || eastAsiaFont || csFont) {
+      if (asciiFont) w_rFonts.attributes['w:ascii'] = asciiFont;
+      if (hAnsiFont) w_rFonts.attributes['w:hAnsi'] = hAnsiFont;
+      if (eastAsiaFont) w_rFonts.attributes['w:eastAsia'] = eastAsiaFont;
+      if (csFont) w_rFonts.attributes['w:cs'] = csFont;
+    } else {
+      w_rFonts.attributes = { 'w:hAnsi': fontFamily, 'w:ascii': fontFamily, 'w:eastAsia': fontFamily, 'w:hint': 'eastAsia' };
+    }
+  }
+  if (w_rFonts) {
+    w_r.elements[0].elements[0] = w_rFonts;
   }
   if (typeof kern !== 'undefined') {
     w_r.elements[0].elements.push({ type: 'element', name: 'w:kern', attributes: { 'w:val': `${kern}` }, elements: [] });
@@ -85,6 +105,17 @@ export const textXmlParamsNodeToXmlElementObj = (textNode: HtmlXmlParamsTextNode
         'w:val': 'single', 'w:sz': '4', 'w:space': '0', 'w:color': borderColor || 'auto',
       },
     });
+  }
+  if (lang || bidiLang) {
+    const w_lang: XmlNode = {
+      type: 'element',
+      name: 'w:lang',
+      attributes: {},
+      elements: [],
+    };
+    if (lang) w_lang.attributes['w:val'] = lang;
+    if (bidiLang) w_lang.attributes['w:bidi'] = bidiLang;
+    w_r.elements[0].elements.push(w_lang);
   }
   // if (shd) {
   //   w_r.elements[0].elements.push({ type: 'element', name: 'w:shd', attributes: { 'w:val': 'pct15', 'w:color': 'auto', 'w:fill': 'FFFFFF' }, elements: [] });
