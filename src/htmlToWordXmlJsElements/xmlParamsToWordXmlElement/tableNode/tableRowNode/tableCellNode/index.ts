@@ -50,7 +50,7 @@ export const tableCellXmlParamsNodeToXmlElementObj = (tableCellNode: HtmlXmlPara
     { type: 'element', name: 'w:tcW', attributes: { 'w:w': '0', 'w:type': 'auto' } },
   ] };
   if (+width) { w_tcPr.elements[0].attributes = { 'w:w': `${width}`, 'w:type': 'dxa' }; }
-  if (vMergeRestart || vMergeRestart) {
+  if (vMergeRestart || vMerge) {
     const w_vMerge: XmlNode = { type: 'element', name: 'w:vMerge', elements: [] };
     if (vMergeRestart) w_vMerge.attributes = { 'w:val': 'restart' };
     w_tcPr.elements.push(w_vMerge);
