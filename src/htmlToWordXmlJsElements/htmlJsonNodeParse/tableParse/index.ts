@@ -112,7 +112,6 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
   const { NODENAME = 'name', CHILDREN = 'elements', STYLE = 'style', ATTRIBUTES = 'attributes', styleCamelCase = false } = options || {};
   const { [CHILDREN]: blocks = [], [STYLE]: style = {}, [ATTRIBUTES]: attributes = {} } = node;
   const gridCols = [];
-  let cols = 0;
   let TRs = [];
   const thead: HtmlJsonNode = blocks.find((ele: HtmlJsonNode) => ele[NODENAME] === 'thead');
   const tbody: HtmlJsonNode = blocks.find((ele: HtmlJsonNode) => ele[NODENAME] === 'tbody');
@@ -142,8 +141,19 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
   } else if (style.width) {
     tableData.width = Math.round(htmlSpacingSizeToWordSizeNumber(style.width));
   }
+  // ==== 计算总列数
+  const firstRow = TRs[0];
+  for (let i = 0; i < firstRow?.[CHILDREN].length; i++) {
+    const { [ATTRIBUTES]: attributes } = firstRow[CHILDREN][i];
+    let { colspan } = attributes || {};
+    colspan = +colspan || 0;
+    tableData.cols = tableData.cols + (colspan > 1 ? colspan : 1);
+  }
+  // ===============
+  if (!tableData.cols) return false;
+
   /** 行数据 */
-  const tableRows: HtmlXmlParamsTableRow[] = TRs.map(() => ({ type: 'tr', cells: [], widths: [] }));
+  const tableRows: HtmlXmlParamsTableRow[] = TRs.map(() => ({ type: 'tr', cells: new Array(tableData.cols), widths: [] }));
   // =====================
   for (let i = 0; i < TRs.length; i++) {
     const row = TRs[i];
@@ -154,6 +164,8 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
     if (row[STYLE]?.[styleCamelCase ? camelCase('page-break-inside') : 'page-break-inside'] === 'avoid') tableRows[i].cantSplit = true;
     if (row[STYLE]?.height) tableRows[i].height = htmlSpacingSizeToWordSizeNumber(row[STYLE].height);
     // ======= ↑ ↑ =======
+    /** 指示单元格实际所在的列坐标 */
+    let kNum = 0;
     for (let j = 0; j < cells.length; j++) {
       const { [CHILDREN]: content, [STYLE]: style = {}, [ATTRIBUTES]: attributes } = cells[j];
       const cellData: HtmlXmlParamsTableCell = {};
@@ -167,12 +179,9 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
         commonData.width = width;
       }
 
-      colspan = +colspan; rowspan = +rowspan;
+      colspan = +colspan || 1; rowspan = +rowspan || 1;
       const cellBorders: XmlTableCellBorders = getCellBorderFromStyles(style, styleCamelCase, borders);
       if (cellBorders) cellData.borders = cellBorders;
-      if (i === 0) {
-        tableData.cols = tableData.cols + (colspan > 1 ? colspan : 1);
-      }
       if (colspan > 1) commonData.colspan = colspan;
       // 单元格的垂直对齐方式， word里默认是top，html里默认是center,对应th，tc属性的vertical-align:bottom/top，center时style里没有。水平对齐由下面的段落控制。
       if (vAlign !== 'top') { commonData.vAlign = vAlign || 'center'; }
@@ -185,20 +194,25 @@ export const tableHtmlJsonNodeParser = async (node: HtmlJsonNode, getImageStepTw
       // **********************
       cellData.content = await tabelCellContentParser(content, getImageStepTwoParamsFn, options);
       if (i === 0) {
-        cols = cols + (+colspan || 1);
         gridCols.push(width);
       }
-      tableRows[i].cells.push({ type: 'tc', ...commonData, ...cellData });
+      /** 由于被上方合并的单元格，在当前行的html中是不存在的，所有当前单元格可能位置需要后移 */
+      let thisMayMergeCellColNum = kNum;
+      while (tableRows[i].cells[thisMayMergeCellColNum]) {
+        thisMayMergeCellColNum = thisMayMergeCellColNum + 1;
+      }
+      tableRows[i].cells[thisMayMergeCellColNum] = { type: 'tc', ...commonData, ...cellData };
       tableRows[i].widths.push(width);
       if (rowspan > 1) {
         const mergeData = { ...commonData, vMerge: true };
         for (let k = 1; k < rowspan; k++) {
-          tableRows[i + k].cells.push({ type: 'tc', ...mergeData });
+          tableRows[i + k].cells[kNum] = { type: 'tc', ...mergeData };
         }
       }
+      kNum = kNum + colspan;
     }
   }
-  tableData.rows = tableRows;
+  tableData.rows = tableRows.map((ele) => ({ ...ele, cells: ele.cells.filter(Boolean) }));
   tableData.colWidths = colWidths;
   const maxColsRow = tableRows.find((ele) => ele.widths.filter(Boolean).length === tableData.cols);
   if (maxColsRow) {
