@@ -73,3 +73,11 @@ export {
   htmlToWordXmlJsElements,
   htmlToJson,
 };
+
+export {
+  paragraphXmlParamsNodeToXmlElementObj,
+} from './xmlParamsToWordXmlElement/paragraphNode';
+
+export {
+  textXmlParamsNodeToXmlElementObj,
+} from './xmlParamsToWordXmlElement/textNode';
