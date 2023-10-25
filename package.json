@@ -33,13 +33,21 @@
     "access": "public"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "^5.54.1",
-    "eslint": "^8.35.0",
-    "eslint-config-egg": "^12.1.0",
-    "father": "^4.1.6",
-    "typescript": "^4.9.5"
+    "@babel/core": "^7.23.2",
+    "@babel/eslint-parser": "^7.22.15",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.52.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "father": "^4.3.6",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@iimm/shared": "^2.1.2"
+    "@iimm/shared": "^2.4.1"
   }
 }

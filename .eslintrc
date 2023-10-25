@@ -1,27 +1,27 @@
 {
-  "extends": "eslint-config-egg/typescript",
   "parser": "@typescript-eslint/parser",
-  "env": {
-    "browser": true
-  },
   "parserOptions": {
     "sourceType": "module",
     "requireConfigFile": false
   },
+  "extends": [
+    "airbnb-typescript",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
+  "env": {
+    "browser": true
+  },
   "rules": {
-    "@typescript-eslint/ban-ts-comment": "off",
-    "generator-star-spacing": "off",
-    "babel/generator-star-spacing": "off",
-    "arrow-parens": [
-      "warn",
-      "always"
-    ],
     "no-empty": [
       "error",
       {
         "allowEmptyCatch": true
       }
     ],
-    "prefer-promise-reject-errors": "off"
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off"
   }
 }
