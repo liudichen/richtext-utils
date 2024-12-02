@@ -12,6 +12,45 @@ import type {
 import { htmlJsonNodeParser } from "./htmlJsonNodeParse";
 import { xmlParamsNodeToXmlElementObj } from "./xmlParamsToWordXmlElement";
 
+const defaultSelfCloseTags = ["br", "hr", "img"];
+
+const defaultReg1 = new RegExp(`</(${defaultSelfCloseTags.join("|")})>`, "g");
+const defaultReg2 = new RegExp(`<(${defaultSelfCloseTags.join("|")})([^>]*)>`, "g");
+
+/**将自闭和标签转换为闭合标签
+ * @param str 待转换字符串
+ * @param selfCloseTags 自定义自闭合标签(默认值：["br", "hr", "img"])
+ */
+export const convertSelfCloseTagsToClosed = (
+  /**待转换字符串 */
+  str: string,
+  /**
+   * 自定义自闭合标签
+   * @default ["br", "hr", "img"]
+   */
+  selfCloseTags?: string[]
+) => {
+  if (typeof str !== "string" || !str?.length || (!!selfCloseTags && !selfCloseTags?.length)) return str;
+
+  let reg1 = defaultReg1;
+  let reg2 = defaultReg2;
+  if (Array.isArray(selfCloseTags) && selfCloseTags.length > 0) {
+    reg1 = new RegExp(`</(${selfCloseTags.join("|")})>`, "g");
+    reg2 = new RegExp(`<(${selfCloseTags.join("|")})([^>]*)>`, "g");
+  }
+  return str.replace(reg1, "").replace(reg2, function (_match, p1, p2: string) {
+    let result: string = "<" + p1;
+    if (p2) {
+      result += p2;
+    }
+    if (!p2 || !p2.endsWith("/")) {
+      result += "/";
+    }
+    result += ">";
+    return result;
+  });
+};
+
 /** 将htmlJson转换为待生成xml对象的参数节点 */
 const htmlJsonToXmlParamsNodes = async (
   htmlJson: HtmlJsonNode | HtmlJsonNode[],
@@ -59,17 +98,18 @@ const htmlToWordXmlJsElements = async (
   htmlToXmlParamNodesOptions: HtmlJsonNodeParserOptions = {},
   xmlParamsNodeToXmlElementConfig: XmlElementGenerationConfig = {}
 ) => {
-  const jsonArr = htmlToJson(htmlStr, {
+  const { selfCloseTags, ...rest } = htmlToXmlParamNodesOptions || {};
+  const jsonArr = htmlToJson(convertSelfCloseTagsToClosed(htmlStr, selfCloseTags), {
     skipComment: true,
     skipClass: true,
     skipScript: true,
     keepInlineStyle: true,
     skipStyle: false,
     skipAttributes: false,
-    styleCamelCase: htmlToXmlParamNodesOptions?.styleCamelCase || false,
-    attributesCamelCase: htmlToXmlParamNodesOptions?.attributesCamelCase || false,
+    styleCamelCase: rest?.styleCamelCase || false,
+    attributesCamelCase: rest.attributesCamelCase || false,
   });
-  const paramsNodes = await htmlJsonToXmlParamsNodes(jsonArr, getImgStepTwoParamsFn, htmlToXmlParamNodesOptions);
+  const paramsNodes = await htmlJsonToXmlParamsNodes(jsonArr, getImgStepTwoParamsFn, rest);
   const elements: XmlNode[] = [];
   for (let i = 0; i < paramsNodes.length; i++) {
     const item = paramsNodes[i] as HtmlXmlParamsNode[] | HtmlXmlParamsNode;

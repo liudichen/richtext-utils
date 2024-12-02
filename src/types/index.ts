@@ -22,6 +22,8 @@ export interface HtmlJsonNodeParserOptions extends HtmlConvertAttributesConfig {
     nextLvl?: boolean,
     index?: number
   ) => { [key: string]: string | number };
+  /** 自闭合标签  */
+  selfCloseTags?: string[];
 }
 
 /** 转化后的xml生成参数节点生成xml对象的配置项 */
