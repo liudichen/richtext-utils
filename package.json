@@ -1,6 +1,6 @@
 {
   "name": "@iimm/richtext-utils",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "使用ckeditor5富文本及其与word转化时使用的一些简单工具",
   "module": "dist/esm/index.js",
   "main": "dist/cjs/index.js",
