@@ -9,6 +9,7 @@ const getImageElementStepOneParamsFromHtmlAttributes = (params: {
 }) => {
   const { src, width, height } = params;
   if (!src || !src?.trim?.()) return null;
+  if (src.startsWith("file:/")) return null;
   const data: HtmlXmlParamsImageNodeStepOne = { type: "image", step: 0, src };
   if (+width > 0 && +height > 0) {
     // 转化为xml里的cx,cy
