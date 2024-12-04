@@ -183,6 +183,7 @@ export interface XmlTableBorder {
   color?: string;
   /** 框线类型 */
   val?: string;
+  space?: number;
 }
 
 /** 单元格的4个边框属性 */
